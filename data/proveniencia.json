@@ -1,0 +1,18 @@
+{
+  "fontes": [
+    "https://dadosabertos.tse.jus.br/dataset/candidatos-2026",
+    "https://dadosabertos.tse.jus.br/dataset/resultados-2026"
+  ],
+  "arquivos": [
+    {
+      "nome": "consulta_cand_2026_GO.csv",
+      "sha256": "b65f889cd890181a5b479f193d77852d202d6c2886185c4e67cc7b3d7dbfdd33"
+    },
+    {
+      "nome": "votacao_candidato_munzona_2026_GO.csv",
+      "sha256": "2a7a3b5b76f2faeccacbb9bc87dafbed042c1541cf9345e58e0497652675f14f"
+    }
+  ],
+  "registros": 595,
+  "comVotacao": 556
+}
