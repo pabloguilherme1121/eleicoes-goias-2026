@@ -35,10 +35,14 @@ const tick = () => new Promise((resolve) => setTimeout(resolve, 50));
   assert.equal(d.getElementById("content").hidden, false);
   assert.equal(
     d.querySelectorAll("#candidateCards .candidate-card").length,
-    150,
+    595,
   );
-  assert.equal(d.querySelectorAll("#ranking li").length, 150);
-  assert.match(d.getElementById("resultCount").textContent, /1–150 de 595/);
+  assert.equal(d.querySelectorAll("#ranking li").length, 556);
+  assert.match(d.getElementById("resultCount").textContent, /1–595 de 595/);
+  assert.equal(d.getElementById("next").disabled, true);
+  assert.equal(d.getElementById("pageSize").value, "all");
+  d.getElementById("pageSize").value = "150";
+  d.getElementById("pageSize").dispatchEvent(new w.Event("change"));
   d.getElementById("next").click();
   assert.equal(
     d.querySelectorAll("#candidateCards .candidate-card").length,
@@ -204,7 +208,7 @@ const tick = () => new Promise((resolve) => setTimeout(resolve, 50));
   await tick();
   assert.equal(
     desktop.window.document.querySelectorAll("#tbody tr").length,
-    150,
+    595,
   );
   assert.equal(
     desktop.window.document.querySelectorAll("#candidateCards .candidate-card")
