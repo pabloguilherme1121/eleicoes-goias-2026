@@ -64,7 +64,7 @@ let savedCityCode = preference("city") || "",
 function pageSize() {
   return [50, 100, 150].includes(Number($("pageSize").value))
     ? Number($("pageSize").value)
-    : 150;
+    : 50;
 }
 function filtered() {
   if (!$("minVotes").validity.valid || !$("maxVotes").validity.valid) return [];
@@ -576,7 +576,7 @@ function queryValues() {
     dados: $("dataFilter").value,
     minimo: $("minVotes").value,
     maximo: $("maxVotes").value,
-    itens: $("pageSize").value === "150" ? "" : $("pageSize").value,
+    itens: $("pageSize").value === "50" ? "" : $("pageSize").value,
     page: page === 1 ? "" : String(page),
   };
 }
@@ -594,7 +594,7 @@ function syncUrl() {
 }
 function restoreFilters() {
   const params = new URLSearchParams(location.search);
-  $("pageSize").value = "150";
+  $("pageSize").value = "50";
   if (["all", "elected", "non"].includes(params.get("view")))
     view = params.get("view");
   $("search").value = params.get("q") || "";
