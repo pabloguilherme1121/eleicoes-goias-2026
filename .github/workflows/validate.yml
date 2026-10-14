@@ -20,6 +20,7 @@ jobs:
       - run: npm ci --ignore-scripts
       - run: npm test
       - run: python scripts/check_data.py
+      - run: python scripts/test_ranking.py
       - name: Verify generated PWA version
         run: |
           python scripts/build_pwa.py
