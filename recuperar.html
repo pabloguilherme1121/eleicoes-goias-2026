@@ -1,0 +1,250 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width,initial-scale=1,viewport-fit=cover"
+    />
+    <meta name="theme-color" content="#0b1420" />
+    <title>Recuperar aplicativo · Goiás 2026</title>
+    <style>
+      html {
+        color-scheme: dark;
+        font: 16px/1.6 system-ui;
+        background: #0b1420;
+        color: #eef4f8;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        max-width: 640px;
+        margin: auto;
+        padding: 24px 20px;
+      }
+      h1 {
+        font-size: 29px;
+        line-height: 1.2;
+      }
+      h2 {
+        font-size: 20px;
+      }
+      p,
+      li {
+        color: #b0c0cc;
+      }
+      a {
+        color: #80e1c5;
+      }
+      button,
+      .button {
+        display: inline-block;
+        min-height: 48px;
+        padding: 12px 16px;
+        border: 1px solid #80e1c5;
+        border-radius: 8px;
+        font: inherit;
+        background: #80e1c5;
+        color: #092019;
+        text-decoration: none;
+        font-weight: 650;
+        cursor: pointer;
+      }
+      button:disabled {
+        opacity: 0.6;
+        cursor: wait;
+      }
+      [hidden] {
+        display: none !important;
+      }
+      .secondary {
+        background: transparent;
+        color: #80e1c5;
+      }
+      section {
+        border-top: 1px solid #33485b;
+        padding: 20px 0;
+      }
+      .actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+      }
+      .note {
+        font-size: 13px;
+      }
+      #status {
+        padding: 12px 0;
+        min-height: 64px;
+      }
+      :focus-visible {
+        outline: 3px solid #eef4f8;
+        outline-offset: 4px;
+      }
+    </style>
+  </head>
+  <body>
+    <a href="./">GO · Observatório Eleitoral</a>
+    <h1>Volte a abrir a consulta.</h1>
+    <p>
+      Se a tela está antiga ou o Chrome mostra “Não foi possível abrir o
+      aplicativo”, comece pela atualização do site.
+    </p>
+    <section>
+      <h2>1. Atualize o site</h2>
+      <p>
+        Este processo verifica a versão publicada e os arquivos offline. Seus
+        favoritos e sua cidade salva são preservados.
+      </p>
+      <button id="recover">Atualizar site com segurança</button>
+      <p id="status" role="status">Conecte-se à internet antes de começar.</p>
+      <a id="openUpdated" class="button" href="./#aplicativo" hidden
+        >Abrir site atualizado</a
+      ><noscript
+        ><p>
+          Ative JavaScript para atualizar. Você também pode abrir a consulta
+          pelo link abaixo.
+        </p></noscript
+      >
+    </section>
+    <section>
+      <h2>2. Se o aplicativo do Android não abrir</h2>
+      <ol>
+        <li>
+          Abra esta página no <strong>Chrome</strong>, sem usar o ícone antigo
+          do aplicativo.
+        </li>
+        <li>
+          Em Configurações do Android → Aplicativos, localize somente
+          <strong>Goiás 2026 / Observatório Eleitoral</strong> e desinstale a
+          instalação anterior.
+        </li>
+        <li>
+          Volte ao site atualizado e use <strong>Instalar aplicativo</strong>,
+          quando oferecido pelo Chrome, ou o menu ⋮ → Adicionar à tela inicial.
+        </li>
+      </ol>
+      <p class="note">
+        O site não consegue remover ou reparar o pacote instalado pelo Android.
+        Evite limpar os dados do Chrome ou do site: isso pode remover favoritos.
+      </p>
+    </section>
+    <section>
+      <h2>Continue pelo navegador</h2>
+      <p>
+        A consulta não exige instalação. Esta alternativa abre a interface
+        publicada com arquivos identificados pela versão, para contornar uma
+        interface antiga em cache. Precisa de conexão.
+      </p>
+      <a class="button secondary" href="consulta.html#consulta"
+        >Abrir consulta no navegador</a
+      >
+      <p class="note">
+        No iPhone, abra o site no Safari → Compartilhar → Adicionar à Tela de
+        Início.
+      </p>
+    </section>
+    <script>
+      "use strict";
+      const root = new URL("./", location.href),
+        button = document.getElementById("recover"),
+        status = document.getElementById("status");
+      function waitWorker(worker, target) {
+        return new Promise((resolve, reject) => {
+          let timer;
+          const finish = (error) => {
+            clearTimeout(timer);
+            worker.removeEventListener("statechange", changed);
+            error ? reject(error) : resolve();
+          };
+          const changed = () => {
+            if (
+              worker.state === target ||
+              (target === "installed" &&
+                ["activating", "activated"].includes(worker.state))
+            )
+              finish();
+            else if (worker.state === "redundant")
+              finish(new Error("Atualização não concluída"));
+          };
+          worker.addEventListener("statechange", changed);
+          timer = setTimeout(
+            () => finish(new Error("Atualização demorou demais")),
+            20000,
+          );
+          changed();
+        });
+      }
+      function ask(worker, type = "OFFLINE_STATUS") {
+        return new Promise((resolve, reject) => {
+          if (!worker) return reject(new Error("Sem versão ativa"));
+          const channel = new MessageChannel(),
+            timer = setTimeout(() => {
+              channel.port1.close();
+              reject(new Error("Sem resposta da versão ativa"));
+            }, 8000);
+          channel.port1.onmessage = (event) => {
+            clearTimeout(timer);
+            channel.port1.close();
+            resolve(event.data);
+          };
+          worker.postMessage({ type }, [channel.port2]);
+        });
+      }
+      button.addEventListener("click", async () => {
+        button.disabled = true;
+        document.getElementById("openUpdated").hidden = true;
+        status.textContent = "Verificando a versão publicada…";
+        try {
+          if (!("serviceWorker" in navigator))
+            throw new Error("Navegador sem atualização offline");
+          const response = await fetch(
+            new URL("versao.json?verificar=" + Date.now(), root),
+            { cache: "no-store" },
+          );
+          if (!response.ok)
+            throw new Error("Sem conexão com a versão publicada");
+          const release = await response.json();
+          if (!/^[a-f0-9]{16}$/.test(release.version))
+            throw new Error("Versão inválida");
+          const registration = await navigator.serviceWorker.register(
+            new URL("service-worker.js", root),
+            { scope: root.href, updateViaCache: "none" },
+          );
+          if (registration.scope !== root.href)
+            throw new Error("Escopo incorreto");
+          await registration.update();
+          if (registration.installing)
+            await waitWorker(registration.installing, "installed");
+          if (registration.waiting) {
+            status.textContent = "Aplicando a versão atualizada…";
+            const waiting = registration.waiting;
+            const activated = waitWorker(waiting, "activated");
+            waiting.postMessage({ type: "ACTIVATE_UPDATE" });
+            await activated;
+          }
+          let result = await ask(registration.active);
+          if (
+            result.version === "goias-eleitoral-" + release.version &&
+            result.ok !== true
+          )
+            result = await ask(registration.active, "REPAIR_CACHE");
+          if (
+            result.version !== "goias-eleitoral-" + release.version ||
+            result.ok !== true
+          )
+            throw new Error("Versão ou arquivos não confirmados");
+          status.textContent =
+            "Site atualizado e arquivos offline verificados. Abra o site abaixo. Se o ícone do Android ainda falhar, siga o passo 2.";
+          document.getElementById("openUpdated").hidden = false;
+        } catch {
+          status.textContent =
+            "Não foi possível confirmar a atualização. Verifique a conexão e tente novamente, ou abra a consulta no navegador abaixo. Seus favoritos não foram apagados.";
+        } finally {
+          button.disabled = false;
+        }
+      });
+    </script>
+  </body>
+</html>

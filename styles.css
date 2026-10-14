@@ -1794,3 +1794,14 @@ body {
     max-width: 95px;
   }
 }
+
+.recovery-banner {
+  padding: 16px;
+  margin: 20px 0;
+  border: 1px solid var(--accent);
+  border-radius: 8px;
+}
+.recovery-banner p {
+  margin: 8px 0 0;
+  font-size: 13px;
+}

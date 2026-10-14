@@ -9,10 +9,23 @@
   if (!install || !status || !update) return;
   let prompt = null,
     registration = null,
-    ready = false;
+    ready = false,
+    installed = false,
+    installing = false;
   const standalone = () =>
     window.matchMedia("(display-mode: standalone)").matches ||
     navigator.standalone === true;
+  function renderInstall() {
+    install.hidden = installed;
+    install.disabled = installing;
+    install.textContent = installing
+      ? "Aguardando navegador…"
+      : prompt
+        ? "Instalar aplicativo"
+        : "Ver como instalar";
+  }
+  installed = standalone();
+  renderInstall();
   function connection() {
     if (standalone()) install.hidden = true;
     status.textContent = "Verificando arquivos para consulta offline…";
@@ -31,8 +44,9 @@
   }
   window.addEventListener("beforeinstallprompt", (event) => {
     event.preventDefault();
+    if (installed) return;
     prompt = event;
-    if (!standalone()) install.hidden = false;
+    renderInstall();
   });
   install.addEventListener("click", async () => {
     if (!prompt) {
@@ -41,7 +55,8 @@
     }
     const current = prompt;
     prompt = null;
-    install.hidden = true;
+    installing = true;
+    renderInstall();
     try {
       await current.prompt();
       const choice = await current.userChoice;
@@ -49,19 +64,29 @@
         choice.outcome === "accepted"
           ? "Instalação solicitada ao navegador. Se aparecer falha ao abrir, consulte Ajuda para instalar."
           : "Instalação cancelada. Você pode continuar pelo navegador.";
-      install.hidden = false;
+      if (installed)
+        status.textContent = "Instalação confirmada pelo navegador.";
     } catch {
       status.textContent =
-        "Use o menu do navegador para instalar o aplicativo.";
+        "O navegador não concluiu a instalação. Abra Ver como instalar ou Recuperar aplicativo.";
+    } finally {
+      installing = false;
+      renderInstall();
     }
   });
   window.addEventListener("appinstalled", () => {
     prompt = null;
-    install.hidden = true;
+    installed = true;
+    renderInstall();
     status.textContent =
-      "Aplicativo instalado. A consulta está disponível na tela inicial.";
+      "Instalação confirmada pelo navegador. Teste o ícone na tela inicial; se falhar ao abrir, use Recuperar aplicativo.";
   });
   const onlineStatus = () => {
+    if (document.documentElement.dataset.recovery) {
+      status.textContent =
+        "Consulta de recuperação online. Abra o site principal após a atualização para usar o modo offline.";
+      return;
+    }
     status.textContent = ready
       ? navigator.onLine
         ? "Consulta offline pronta neste aparelho."
@@ -114,7 +139,7 @@
         : "Arquivos offline incompletos. Conecte-se e use Verificar arquivos offline para reparar.";
       return result;
     } catch {
-      ready = false;
+      ((ready = false), (installed = false), (installing = false));
       status.textContent =
         "Não foi possível confirmar os arquivos offline. Conecte-se e tente verificar novamente.";
     }

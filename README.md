@@ -74,3 +74,11 @@ npm test
 As dependências são apenas de desenvolvimento. O site publicado continua estático e sem bibliotecas externas de execução. O teste de interação verifica links diretos, histórico, filtros, comparação e a preparação completa da impressão; não representa uma validação da janela de impressão ou da instalação física no Android.
 
 Comparações podem ser compartilhadas pelo parâmetro `comparar`, com até três identificadores únicos e válidos. Minha cidade guarda apenas o código IBGE da cidade escolhida no navegador, mediante ação explícita; não usa geolocalização nem altera automaticamente os filtros de links recebidos. A ordenação fica visível na consulta e a legenda da tabela acompanha a escolha.
+
+## Recuperação de interface antiga e instalação
+
+`recuperar.html` é uma página independente, com CSS e lógica incorporados. Ela consulta `versao.json` sem cache, solicita a atualização do worker no escopo deste projeto, aplica uma versão em espera e compara o identificador ativo e a verificação de arquivos antes de informar sucesso. Arquivos incompletos da versão atual podem ser reparados. Nenhuma preferência local é apagada; nenhuma instalação nativa do Android é removida pelo site.
+
+`consulta.html` é uma rota online gerada a partir da interface, com URLs dos scripts, estilo e dados identificadas pela versão. Ela permite consultar sem reutilizar os arquivos antigos conhecidos por um worker anterior. Não é um download de HTML e não promete navegação offline nessa rota. Depois da recuperação, a raiz do site oferece a consulta offline habitual.
+
+O gerador de PWA também atualiza `versao.json` e `consulta.html`. O CI verifica esses arquivos. O teste de recuperação cobre falha, cancelamento e confirmação do prompt, atualização em espera, versão incorreta, reparo parcial, indisponibilidade de rede e preservação das preferências. O lançamento de um WebAPK no aparelho Android precisa ser testado no próprio aparelho.

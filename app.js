@@ -479,7 +479,11 @@ async function load() {
     if (embedded) {
       data = JSON.parse(embedded.textContent);
     } else {
-      const response = await fetch("data/candidatos.json");
+      const response = await fetch(
+        document.documentElement.dataset.recovery
+          ? "data/candidatos.json?v=" + document.documentElement.dataset.release
+          : "data/candidatos.json",
+      );
       if (!response.ok) throw new Error("HTTP " + response.status);
       data = await response.json();
     }

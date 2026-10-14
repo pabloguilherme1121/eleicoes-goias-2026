@@ -23,4 +23,4 @@ jobs:
       - name: Verify generated PWA version
         run: |
           python scripts/build_pwa.py
-          git diff --exit-code -- index.html service-worker.js
+          git diff --exit-code -- index.html service-worker.js consulta.html versao.json

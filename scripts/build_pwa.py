@@ -7,6 +7,7 @@ source=path.read_text(encoding='utf8')
 template=re.sub(r"const CACHE = '[^']+';", "const CACHE = 'goias-eleitoral-__VERSION__';",source)
 template=re.sub(r'const INTEGRITY = .*?;', 'const INTEGRITY = __INTEGRITY__;',template)
 digest=hashlib.sha256(template.encode())
+digest.update((root/'recuperar.html').read_bytes())
 integrity={}
 for name in ['index.html','styles.css','model.js','app.js','pwa.js','manifest.webmanifest','data/candidatos.json']:
     data=(root/name).read_bytes()
@@ -23,3 +24,12 @@ index.write_text(re.sub(r'data-release="[^"]*"','data-release="'+version+'"',ind
 integrity['index.html']='sha256-'+base64.b64encode(hashlib.sha256(index.read_bytes()).digest()).decode()
 path.write_text(template.replace('__VERSION__',version).replace('__INTEGRITY__',json.dumps(integrity,separators=(',',':'))),encoding='utf8',newline='\n')
 print('Cache PWA:',version)
+
+# Rotas online de recuperação não são incluídas no cache antigo do aplicativo.
+(root/'versao.json').write_text(json.dumps(dict(version=version),separators=(',',':')),encoding='utf8',newline='\n')
+fresh=index.read_text(encoding='utf8').replace('<html ', '<html data-recovery="true" ',1)
+for name in ['styles.css','model.js','app.js','pwa.js','manifest.webmanifest']:
+    fresh=fresh.replace('"'+name+'"','"'+name+'?v='+version+'"')
+fresh=fresh.replace('<main>','<main><aside class="recovery-banner"><strong>Consulta de recuperação online</strong><p>Esta página precisa de conexão. Para atualizar o aplicativo e preparar a consulta offline, <a href="recuperar.html">abra a recuperação</a>.</p></aside>',1)
+fresh=fresh.replace('Funciona offline também no navegador.','Abra o site principal após atualizar para consultar offline.')
+(root/'consulta.html').write_text(fresh,encoding='utf8',newline='\n')
