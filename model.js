@@ -19,7 +19,9 @@
     const search = new Map(
       candidates.map((c) => [
         c.id,
-        normalize(`${c.nome} ${c.nomeCompleto} ${c.numero} ${c.partido}`),
+        normalize(
+          `${c.nome} ${c.nomeCompleto} ${c.numero} ${c.partido} ${c.ocupacao || ""} ${c.escolaridade || ""}`,
+        ),
       ]),
     );
     const votesByCity = municipalities.map(() => new Map());
@@ -138,7 +140,24 @@
     }
     function select(filters = {}) {
       const current = scope(filters.city ?? "", filters.region ?? ""),
-        query = normalize(filters.query).trim();
+        query = normalize(filters.query).trim().split(/\s+/).filter(Boolean);
+      const ages = {
+          "18-29": [18, 29],
+          "30-44": [30, 44],
+          "45-59": [45, 59],
+          "60+": [60, Infinity],
+        },
+        age = ages[filters.age];
+      const bound = (value) =>
+        value !== null &&
+        value !== undefined &&
+        value !== "" &&
+        Number.isSafeInteger(Number(value)) &&
+        Number(value) >= 0
+          ? Number(value)
+          : null;
+      const min = bound(filters.minVotes),
+        max = bound(filters.maxVotes);
       const found = current.ordered.filter(
         (c) =>
           (filters.view !== "elected" || c.eleito) &&
@@ -148,7 +167,16 @@
           (!filters.status || c.situacao === filters.status) &&
           (!filters.favoritesOnly || filters.favorites?.has(c.id)) &&
           (!filters.withVotes || (current.votes(c) ?? 0) > 0) &&
-          (!query || search.get(c.id).includes(query)),
+          (!age ||
+            (c.idade != null && c.idade >= age[0] && c.idade <= age[1])) &&
+          (filters.data !== "assets" || c.bensDeclarados != null) &&
+          (filters.data !== "networks" || c.redesDeclaradas?.length > 0) &&
+          (filters.data !== "missingVotes" || c.votos == null) &&
+          (min === null ||
+            (current.votes(c) != null && current.votes(c) >= min)) &&
+          (max === null ||
+            (current.votes(c) != null && current.votes(c) <= max)) &&
+          query.every((token) => search.get(c.id).includes(token)),
       );
       if (filters.sort === "name")
         found.sort((a, b) => collator.compare(a.nome, b.nome));

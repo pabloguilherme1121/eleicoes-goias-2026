@@ -62,9 +62,12 @@ let comparisonSignature = "";
 let savedCityCode = preference("city") || "",
   cityIsPersistent = true;
 function pageSize() {
-  return 50;
+  return [50, 100, 150].includes(Number($("pageSize").value))
+    ? Number($("pageSize").value)
+    : 150;
 }
 function filtered() {
+  if (!$("minVotes").validity.valid || !$("maxVotes").validity.valid) return [];
   return model
     ? model.select({
         city: $("municipalityFilter").value,
@@ -77,6 +80,10 @@ function filtered() {
         favoritesOnly: $("favoritesOnly").checked,
         favorites,
         withVotes: $("withVotesOnly").checked,
+        age: $("ageFilter").value,
+        data: $("dataFilter").value,
+        minVotes: $("minVotes").value,
+        maxVotes: $("maxVotes").value,
       })
     : [];
 }
@@ -170,6 +177,7 @@ function money(n) {
   return n == null ? "Sem registro na base" : moneyFormat.format(n);
 }
 function render() {
+  validateVoteRange();
   const scope = currentScope();
   $("territorySelection").textContent = scope.label;
   $("scopeNote").textContent =
@@ -179,15 +187,16 @@ function render() {
     found = filtered(),
     pages = Math.max(1, Math.ceil(found.length / size));
   page = Math.min(page, pages);
+  const electedCount = found.filter((c) => c.eleito).length;
   $("resultCount").textContent =
-    `${found.length ? fmt((page - 1) * size + 1) + "–" + fmt(Math.min(page * size, found.length)) : "0"} de ${fmt(found.length)} resultados · ${fmt(candidates.length)} registros na base · ${fmt(found.filter((c) => c.eleito).length)} eleitos na lista`;
+    `${found.length ? fmt((page - 1) * size + 1) + "–" + fmt(Math.min(page * size, found.length)) : "0"} de ${fmt(found.length)} ${found.length === 1 ? "resultado" : "resultados"} · ${fmt(candidates.length)} registros na base · ${fmt(electedCount)} ${electedCount === 1 ? "eleito" : "eleitos"} na lista`;
   $("tbody").innerHTML = window.matchMedia?.("(max-width:760px)").matches
     ? ""
     : found
         .slice((page - 1) * size, page * size)
         .map(
           (c) =>
-            `<tr><td><input type="checkbox" aria-label="Comparar ${esc(c.nome)}" data-compare="${esc(c.id)}" ${selected.has(c.id) ? "checked" : ""}></td><td class="num">${rankFor(c) ?? "—"}</td><td class="name">${esc(displayName(c.nome))}<small>Nº ${esc(c.numero)} · ${esc(c.partido)}</small><small class="candidate-territory">${territoryLabel(c)}</small></td><td><span class="badge ${c.eleito ? "elected" : ""}">${esc(c.situacao)}</span></td><td class="num">${fmt(votesFor(c))}</td><td class="num">${percentage(c)}</td><td><button class="detail-button" data-profile="${esc(c.id)}">Ver perfil</button></td></tr>`,
+            `<tr><td><input type="checkbox" aria-label="Comparar ${esc(c.nome)}" data-compare="${esc(c.id)}" ${selected.has(c.id) ? "checked" : ""}></td><td class="num">${rankFor(c) ?? "—"}</td><td class="name">${esc(displayName(c.nome))}<small>Nº ${esc(c.numero)} · ${esc(c.partido)}</small><small class="candidate-bio">${candidateBio(c)}</small><small class="candidate-territory">${territoryLabel(c)}</small></td><td><span class="badge ${c.eleito ? "elected" : ""}">${esc(c.situacao)}</span></td><td class="num">${fmt(votesFor(c))}</td><td class="num">${percentage(c)}</td><td><button class="detail-button" data-profile="${esc(c.id)}">Ver perfil</button></td></tr>`,
         )
         .join("");
   $("candidateCards").innerHTML = !window.matchMedia?.("(max-width:760px)")
@@ -197,7 +206,7 @@ function render() {
         .slice((page - 1) * size, page * size)
         .map(
           (c) =>
-            `<article class="candidate-card"><span class="card-rank">${rankFor(c) ? "#" + rankFor(c) + " no ranking nominal" : "Sem posição no ranking"}</span><h3>${esc(displayName(c.nome))}</h3><p class="identity">${esc(c.partido)} · Nº ${esc(c.numero)}</p><span class="badge ${c.eleito ? "elected" : ""}">${esc(c.situacao)}</span><p class="candidate-territory">${territoryLabel(c)}</p><div class="card-votes"><div><small>Votos nominais</small><strong>${fmt(votesFor(c))}</strong></div><div class="percent"><small>Do total nominal</small><strong>${percentage(c)}</strong></div></div><div class="card-controls"><button data-profile="${c.id}" aria-label="Ver perfil de ${esc(c.nome)}">Ver perfil</button><label><input type="checkbox" data-compare="${c.id}" ${selected.has(c.id) ? "checked" : ""}><span>Comparar</span><span class="sr-only"> ${esc(c.nome)} (${esc(c.numero)})</span></label></div><button class="favorite-button" data-favorite="${c.id}" aria-pressed="${favorites.has(c.id)}" aria-label="${favorites.has(c.id) ? "Remover favorito" : "Salvar favorito"}: ${esc(c.nome)}">${icon("star")}${favorites.has(c.id) ? "Favorito salvo" : "Salvar favorito"}</button></article>`,
+            `<article class="candidate-card"><span class="card-rank">${rankFor(c) ? "#" + rankFor(c) + " no ranking nominal" : "Sem posição no ranking"}</span><h3>${esc(displayName(c.nome))}</h3><p class="identity">${esc(c.partido)} · Nº ${esc(c.numero)}</p><p class="candidate-bio">${candidateBio(c)}</p><span class="badge ${c.eleito ? "elected" : ""}">${esc(c.situacao)}</span><p class="candidate-territory">${territoryLabel(c)}</p><div class="card-votes"><div><small>Votos nominais</small><strong>${fmt(votesFor(c))}</strong></div><div class="percent"><small>Do total nominal</small><strong>${percentage(c)}</strong></div></div><div class="card-controls"><button data-profile="${c.id}" aria-label="Ver perfil de ${esc(c.nome)}">Ver perfil</button><label><input type="checkbox" data-compare="${c.id}" ${selected.has(c.id) ? "checked" : ""}><span>Comparar</span><span class="sr-only"> ${esc(c.nome)} (${esc(c.numero)})</span></label></div><button class="favorite-button" data-favorite="${c.id}" aria-pressed="${favorites.has(c.id)}" aria-label="${favorites.has(c.id) ? "Remover favorito" : "Salvar favorito"}: ${esc(c.nome)}">${icon("star")}${favorites.has(c.id) ? "Favorito salvo" : "Salvar favorito"}</button></article>`,
         )
         .join("");
   $("filterCount").textContent =
@@ -391,6 +400,10 @@ function reset() {
     "regionFilter",
     "municipalityFilter",
     "municipalitySearch",
+    "ageFilter",
+    "dataFilter",
+    "minVotes",
+    "maxVotes",
   ].forEach((id) => ($(id).value = ""));
   $("sort").value = "votes";
   $("favoritesOnly").checked = false;
@@ -454,6 +467,11 @@ document.addEventListener("change", (e) => {
   "municipalityFilter",
   "favoritesOnly",
   "withVotesOnly",
+  "ageFilter",
+  "dataFilter",
+  "minVotes",
+  "maxVotes",
+  "pageSize",
 ].forEach((id) =>
   $(id).addEventListener(id === "search" ? "input" : "change", () => {
     page = 1;
@@ -549,6 +567,11 @@ function queryValues() {
     cidade: city === "" ? "" : String(municipalities[Number(city)].codigoIbge),
     comvotos: $("withVotesOnly").checked ? "1" : "",
     sort: $("sort").value === "votes" ? "" : $("sort").value,
+    idade: $("ageFilter").value,
+    dados: $("dataFilter").value,
+    minimo: $("minVotes").value,
+    maximo: $("maxVotes").value,
+    itens: $("pageSize").value === "150" ? "" : $("pageSize").value,
     page: page === 1 ? "" : String(page),
   };
 }
@@ -566,6 +589,7 @@ function syncUrl() {
 }
 function restoreFilters() {
   const params = new URLSearchParams(location.search);
+  $("pageSize").value = "150";
   if (["all", "elected", "non"].includes(params.get("view")))
     view = params.get("view");
   $("search").value = params.get("q") || "";
@@ -577,10 +601,20 @@ function restoreFilters() {
     ["statusFilter", "status"],
     ["sort", "sort"],
     ["regionFilter", "regiao"],
+    ["ageFilter", "idade"],
+    ["dataFilter", "dados"],
+    ["pageSize", "itens"],
   ]) {
     const value = params.get(key);
     if (value && [...$(id).options].some((o) => o.value === value))
       $(id).value = value;
+  }
+  for (const [id, key] of [
+    ["minVotes", "minimo"],
+    ["maxVotes", "maximo"],
+  ]) {
+    const value = params.get(key);
+    $(id).value = value && /^\d{1,12}$/.test(value) ? value : "";
   }
   renderMunicipalityOptions();
   let city = params.get("cidade")
@@ -805,10 +839,10 @@ function renderAnalysis() {
     chartMode === "seats"
       ? "41 cadeiras estaduais. Clique em um partido para consultar seus perfis."
       : "Soma dos votos nominais por partido no recorte. Não inclui votos de legenda.";
-  $("rankingTitle").textContent = "Até 50 mais votados · " + scope.label;
+  $("rankingTitle").textContent = "Até 150 mais votados · " + scope.label;
   $("ranking").innerHTML = scope.ordered
     .filter((c) => scope.votes(c) != null)
-    .slice(0, 50)
+    .slice(0, 150)
     .map(
       (c, i) =>
         `<li><span>${i + 1}</span><button data-profile="${c.id}">${esc(c.nome)}<small>${esc(c.partido)} · ${esc(c.situacao)}</small></button><strong>${fmt(scope.votes(c))}</strong></li>`,
@@ -933,9 +967,16 @@ function chooseTerritory(region = "", city = "") {
   if ($("profile").open) $("profile").close();
   view = "all";
   page = 1;
-  ["search", "partyFilter", "statusFilter", "municipalitySearch"].forEach(
-    (id) => ($(id).value = ""),
-  );
+  [
+    "search",
+    "partyFilter",
+    "statusFilter",
+    "municipalitySearch",
+    "ageFilter",
+    "dataFilter",
+    "minVotes",
+    "maxVotes",
+  ].forEach((id) => ($(id).value = ""));
   $("favoritesOnly").checked = false;
   $("withVotesOnly").checked = true;
   $("sort").value = "votes";
@@ -981,9 +1022,15 @@ function renderActiveFilters() {
     ["municipalityFilter", "Município"],
     ["partyFilter", "Partido"],
     ["statusFilter", "Situação"],
+    ["ageFilter", "Idade"],
+    ["dataFilter", "Dados"],
   ])
     if ($(id).value)
       items.push([id, label + ": " + $(id).selectedOptions[0].textContent]);
+  if ($("minVotes").value)
+    items.push(["minVotes", "Mínimo: " + $("minVotes").value + " votos"]);
+  if ($("maxVotes").value)
+    items.push(["maxVotes", "Máximo: " + $("maxVotes").value + " votos"]);
   if ($("favoritesOnly").checked) items.push(["favoritesOnly", "Favoritos"]);
   if ($("withVotesOnly").checked) items.push(["withVotesOnly", "Com votos"]);
   $("activeFilters").innerHTML = items
@@ -1081,6 +1128,10 @@ window.addEventListener("popstate", () => {
     "regionFilter",
     "municipalityFilter",
     "municipalitySearch",
+    "ageFilter",
+    "dataFilter",
+    "minVotes",
+    "maxVotes",
   ].forEach((id) => ($(id).value = ""));
   $("sort").value = "votes";
   const id = new URLSearchParams(location.search).get("perfil");
@@ -1194,3 +1245,27 @@ $("shareComparison").addEventListener("click", async () => {
       "Copie o link selecionado para compartilhar a comparação.";
   }
 });
+
+function candidateBio(c) {
+  const parts = [];
+  if (c.idade != null) parts.push(c.idade + " anos");
+  if (c.ocupacao) parts.push(displayName(c.ocupacao));
+  return parts.length
+    ? esc(parts.join(" · "))
+    : "Idade e ocupação não informadas";
+}
+function validateVoteRange() {
+  const min = $("minVotes"),
+    max = $("maxVotes");
+  const bad = !min.validity.valid || !max.validity.valid,
+    swapped =
+      min.value !== "" &&
+      max.value !== "" &&
+      Number(min.value) > Number(max.value);
+  $("filterError").hidden = !bad && !swapped;
+  $("filterError").textContent = bad
+    ? "Use números inteiros maiores ou iguais a zero."
+    : swapped
+      ? "O mínimo supera o máximo. Ajuste o intervalo para obter resultados."
+      : "";
+}

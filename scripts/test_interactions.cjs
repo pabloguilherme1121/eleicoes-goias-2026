@@ -5,14 +5,14 @@ const assert = require("node:assert/strict"),
 const { JSDOM } = require("jsdom");
 const root = path.resolve(__dirname, ".."),
   data = JSON.parse(fs.readFileSync(root + "/data/candidatos.json", "utf8"));
-function setup(url) {
+function setup(url, mobile = true) {
   const dom = new JSDOM(fs.readFileSync(root + "/index.html", "utf8"), {
     url,
     runScripts: "outside-only",
     pretendToBeVisual: true,
   });
   const w = dom.window;
-  w.matchMedia = () => ({ matches: true });
+  w.matchMedia = () => ({ matches: mobile });
   w.fetch = async () => ({ ok: true, json: async () => data });
   w.HTMLElement.prototype.scrollIntoView = function () {};
   w.HTMLDialogElement.prototype.showModal = function () {
@@ -35,17 +35,40 @@ const tick = () => new Promise((resolve) => setTimeout(resolve, 50));
   assert.equal(d.getElementById("content").hidden, false);
   assert.equal(
     d.querySelectorAll("#candidateCards .candidate-card").length,
-    50,
+    150,
   );
-  assert.equal(d.querySelectorAll("#ranking li").length, 50);
-  assert.match(d.getElementById("resultCount").textContent, /1–50 de 595/);
+  assert.equal(d.querySelectorAll("#ranking li").length, 150);
+  assert.match(d.getElementById("resultCount").textContent, /1–150 de 595/);
   d.getElementById("next").click();
+  assert.equal(
+    d.querySelectorAll("#candidateCards .candidate-card").length,
+    150,
+  );
+  assert.match(d.getElementById("resultCount").textContent, /151–300 de 595/);
+  d.getElementById("prev").click();
+  d.getElementById("pageSize").value = "50";
+  d.getElementById("pageSize").dispatchEvent(new w.Event("change"));
   assert.equal(
     d.querySelectorAll("#candidateCards .candidate-card").length,
     50,
   );
-  assert.match(d.getElementById("resultCount").textContent, /51–100 de 595/);
-  d.getElementById("prev").click();
+  d.getElementById("pageSize").value = "150";
+  d.getElementById("pageSize").dispatchEvent(new w.Event("change"));
+  d.getElementById("dataFilter").value = "missingVotes";
+  d.getElementById("dataFilter").dispatchEvent(new w.Event("change"));
+  assert.equal(
+    d.querySelectorAll("#candidateCards .candidate-card").length,
+    39,
+  );
+  d.querySelector('[data-clear-filter="dataFilter"]').click();
+  d.getElementById("minVotes").value = "100";
+  d.getElementById("maxVotes").value = "10";
+  d.getElementById("maxVotes").dispatchEvent(new w.Event("change"));
+  assert.equal(d.getElementById("filterError").hidden, false);
+  assert.equal(d.getElementById("mobileEmpty").hidden, false);
+  d.querySelector('[data-clear-filter="minVotes"]').click();
+  d.querySelector('[data-clear-filter="maxVotes"]').click();
+
   assert.equal(d.getElementById("profile").open, true);
   assert.equal(
     new w.URLSearchParams(w.location.search).get("perfil"),
@@ -167,6 +190,28 @@ const tick = () => new Promise((resolve) => setTimeout(resolve, 50));
     /apenas nesta sessão/,
   );
   linked.window.close();
+  const advanced = setup(
+      "https://example.test/?minimo=0&maximo=1000&idade=60%2B&dados=assets&itens=100",
+    ),
+    ad = advanced.window.document;
+  await tick();
+  assert.equal(ad.getElementById("ageFilter").value, "60+");
+  assert.equal(ad.getElementById("dataFilter").value, "assets");
+  assert.equal(ad.getElementById("minVotes").value, "0");
+  assert.equal(ad.getElementById("pageSize").value, "100");
+  advanced.window.close();
+  const desktop = setup("https://example.test/", false);
+  await tick();
+  assert.equal(
+    desktop.window.document.querySelectorAll("#tbody tr").length,
+    150,
+  );
+  assert.equal(
+    desktop.window.document.querySelectorAll("#candidateCards .candidate-card")
+      .length,
+    0,
+  );
+  desktop.window.close();
 
   console.log(
     "PASS: links de perfil, navegação, histórico, filtros, limite de comparação, impressão completa e ausência de exportações.",

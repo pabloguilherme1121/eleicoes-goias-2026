@@ -27,3 +27,14 @@ assert.equal(model.scope('invalid').total,model.total);
 const synthetic=createModel({municipios:[{nome:'A',votosNominais:3,regiaoIntermediaria:{id:1,nome:'R'}}],candidatos:[{id:'missing',nome:'Sem base',votos:null},{id:'zero',nome:'Zero',votos:0,votacaoMunicipal:[]},{id:'known',nome:'Conhecido',votos:3,votacaoMunicipal:[[0,3]]}]});
 assert.equal(synthetic.scope('0').votes(synthetic.byId.get('missing')),null);assert.equal(synthetic.scope('0').votes(synthetic.byId.get('zero')),0);assert.equal(synthetic.territory(synthetic.byId.get('zero')).topCity,null);assert(!synthetic.scope('0').ranks.has('missing'));assert.equal(synthetic.select({withVotes:true}).length,1);
 console.log('PASS: totais por região e candidatura, município, concentração, filtros, ausência versus zero e precedência territorial.');
+
+assert(model.select({query:'mdb carol'}).some(c=>c.id===carol.id));
+assert.equal(model.select({data:'missingVotes'}).length,39);
+assert.equal(model.select({data:'assets'}).length,422);
+assert.equal(model.select({data:'networks'}).length,482);
+for(const c of model.select({age:'60+'}))assert(c.idade>=60);
+for(const c of model.select({city:String(index),minVotes:100,maxVotes:1000})){assert(model.scope(String(index)).votes(c)>=100);assert(model.scope(String(index)).votes(c)<=1000)}
+assert.equal(model.select({minVotes:100,maxVotes:10}).length,0);
+assert.equal(synthetic.select({minVotes:0}).length,2);
+assert.equal(synthetic.select({age:'60+'}).length,0);
+console.log('PASS: busca multiterma, disponibilidade de dados, faixas etárias e limites locais sem transformar ausência em zero.');

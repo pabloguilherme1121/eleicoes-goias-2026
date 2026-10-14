@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="pt-BR" data-release="67c565bd292fd4c1">
+<html lang="pt-BR" data-release="af8653c15819d0d9">
   <head>
     <meta charset="utf-8" />
     <meta
@@ -162,7 +162,7 @@
             ><input
               type="search"
               id="search"
-              placeholder="Busque por nome, número ou partido"
+              placeholder="Nome, número, partido ou ocupação"
               autocomplete="off"
             />
           </div>
@@ -222,6 +222,41 @@
               </summary>
               <div class="filters">
                 <label
+                  >Faixa etária<select id="ageFilter">
+                    <option value="">Todas as idades</option>
+                    <option value="18-29">18 a 29 anos</option>
+                    <option value="30-44">30 a 44 anos</option>
+                    <option value="45-59">45 a 59 anos</option>
+                    <option value="60+">60 anos ou mais</option>
+                  </select></label
+                ><label
+                  >Dados disponíveis<select id="dataFilter">
+                    <option value="">Todos os registros</option>
+                    <option value="assets">Com bens declarados</option>
+                    <option value="networks">Com redes declaradas</option>
+                    <option value="missingVotes">
+                      Sem registro de votação estadual
+                    </option>
+                  </select></label
+                ><label
+                  >Votos mínimos no recorte<input
+                    id="minVotes"
+                    type="number"
+                    min="0"
+                    step="1"
+                    inputmode="numeric"
+                    placeholder="Sem mínimo" /></label
+                ><label
+                  >Votos máximos no recorte<input
+                    id="maxVotes"
+                    type="number"
+                    min="0"
+                    step="1"
+                    inputmode="numeric"
+                    placeholder="Sem máximo"
+                /></label>
+                <p id="filterError" class="error" role="status" hidden></p>
+                <label
                   >Partido<select id="partyFilter">
                     <option value="">Todos os partidos</option>
                   </select></label
@@ -270,6 +305,13 @@
             <p id="cityStatus" class="chart-note" role="status"></p>
           </div>
           <div class="result-tools">
+            <label class="page-size-control"
+              >Por página<select id="pageSize">
+                <option value="50">50</option>
+                <option value="100">100</option>
+                <option value="150" selected>150</option>
+              </select></label
+            >
             <label class="sort-control"
               >Ordenar<select id="sort">
                 <option value="votes">Mais votos</option>

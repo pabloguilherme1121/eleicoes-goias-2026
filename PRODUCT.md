@@ -23,3 +23,5 @@ Leitura territorial autorizada: filtro por regiões imediatas/intermediárias do
 Refinamento funcional: perfis compartilháveis por identificador, navegação sequencial e histórico do navegador, filtros removíveis, comparação persistente, impressão municipal completa e validação automática de dados/cache/interações. Dados e denominações territoriais permanecem factuais.
 
 Atalhos de cidade e comparações: guardar a cidade apenas por ação explícita, informar falha de armazenamento, manter preferências locais fora dos links compartilhados, restaurar até três identificadores únicos válidos e explicar a ordenação corrente.
+
+Consulta ampliada: até 150 candidatos por página e no ranking, opções de 50/100/150, idade e ocupação nos resultados, busca por termos combinados e filtros por faixa etária, dados disponíveis e limites de votos no território. A base segue com 595 registros oficiais, sem candidaturas inventadas.

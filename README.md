@@ -83,4 +83,6 @@ Comparações podem ser compartilhadas pelo parâmetro `comparar`, com até trê
 
 O gerador de PWA também atualiza `versao.json` e `consulta.html`. O CI verifica esses arquivos. O teste de recuperação cobre falha, cancelamento e confirmação do prompt, atualização em espera, versão incorreta, reparo parcial, indisponibilidade de rede e preservação das preferências. O lançamento de um WebAPK no aparelho Android precisa ser testado no próprio aparelho.
 
-Consulta com até 50 candidaturas por página no celular e desktop, intervalo visível dos resultados e ranking com até 50 perfis. Todos os registros continuam acessíveis pela paginação e filtros.
+Consulta com até 150 candidaturas por página no celular e desktop, intervalo visível dos resultados e ranking com até 150 perfis. Todos os registros continuam acessíveis pela paginação e filtros.
+
+Filtros adicionais: faixa etária, disponibilidade de bens/redes, ausência de votação estadual e faixa de votos no recorte. A busca combina palavras em qualquer ordem e inclui ocupação e escolaridade. Idade e ocupação passam a aparecer diretamente nos resultados. O usuário pode escolher 50, 100 ou 150 registros por página; links preservam esses controles. Não foram inventados candidatos ou acrescentadas estimativas à base de 595 registros.
