@@ -6,7 +6,7 @@ Dashboard independente para consultar candidaturas a deputado estadual em Goiás
 
 Esta base é um retrato dos arquivos oficiais gerados em **13/10/2026**, e não uma apuração ao vivo. **Situação eleitoral** e **julgamento da candidatura** são informações diferentes. Perfis com julgamento distinto de `DEFERIDO` ou votos com destinação especial recebem um aviso contextual, preservando a classificação publicada pelo TSE. Os percentuais locais usam o total dos **votos nominais** do território, não o total de votos válidos que inclui legenda.
 
-O resumo distingue **595 registros de candidatura**, **33 sem resultado eleitoral informado** e **39 sem votação registrada** (incluindo 6 classificados como não eleitos). Ausência de registro não é tratada como zero voto. A página começa exibindo 50 candidatos por vez, podendo aumentar para 100 ou 150.
+O resumo distingue **595 registros de candidatura**, **33 sem resultado eleitoral informado** e **39 sem votação registrada** (incluindo 6 classificados como não eleitos). Ausência de registro não é tratada como zero voto. A página começa exibindo as 595 candidaturas, com opção de paginação de 50, 100 ou 150 por página.
 
 ## Recursos
 

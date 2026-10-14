@@ -64,7 +64,7 @@ let savedCityCode = preference("city") || "",
 function pageSize() {
   return [50, 100, 150].includes(Number($("pageSize").value))
     ? Number($("pageSize").value)
-    : 50;
+    : Math.max(1, candidates.length);
 }
 function filtered() {
   if (!$("minVotes").validity.valid || !$("maxVotes").validity.valid) return [];
@@ -510,6 +510,8 @@ async function load() {
       data = await response.json();
     }
     candidates = data.candidatos;
+    $("pageSize").querySelector('[value="all"]').textContent =
+      `Todos (${fmt(candidates.length)})`;
     meta = data.meta;
     municipalities = data.municipios || [];
     model = ElectionCore.createModel(data);
@@ -576,7 +578,7 @@ function queryValues() {
     dados: $("dataFilter").value,
     minimo: $("minVotes").value,
     maximo: $("maxVotes").value,
-    itens: $("pageSize").value === "50" ? "" : $("pageSize").value,
+    itens: $("pageSize").value === "all" ? "" : $("pageSize").value,
     page: page === 1 ? "" : String(page),
   };
 }
@@ -594,7 +596,7 @@ function syncUrl() {
 }
 function restoreFilters() {
   const params = new URLSearchParams(location.search);
-  $("pageSize").value = "50";
+  $("pageSize").value = "all";
   if (["all", "elected", "non"].includes(params.get("view")))
     view = params.get("view");
   $("search").value = params.get("q") || "";
@@ -844,10 +846,9 @@ function renderAnalysis() {
     chartMode === "seats"
       ? "41 cadeiras estaduais. Clique em um partido para consultar seus perfis."
       : "Soma dos votos nominais por partido no recorte. Não inclui votos de legenda.";
-  $("rankingTitle").textContent = "Até 150 mais votados · " + scope.label;
+  $("rankingTitle").textContent = "Ranking completo · " + scope.label;
   $("ranking").innerHTML = scope.ordered
     .filter((c) => scope.votes(c) != null)
-    .slice(0, 150)
     .map(
       (c, i) =>
         `<li><span>${i + 1}</span><button data-profile="${c.id}">${esc(c.nome)}<small>${esc(c.partido)} · ${esc(c.situacao)}</small></button><strong>${fmt(scope.votes(c))}</strong></li>`,

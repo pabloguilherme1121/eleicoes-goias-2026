@@ -33,20 +33,23 @@ const tick = () => new Promise((resolve) => setTimeout(resolve, 50));
     d = w.document;
   await tick();
   assert.equal(d.getElementById("content").hidden, false);
-  assert.equal(d.getElementById("pageSize").value, "50");
+  assert.equal(d.getElementById("pageSize").value, "all");
   assert.match(d.getElementById("noVotesNote").textContent, /39 sem votação registrada/);
   assert.equal(
     d.querySelectorAll("#candidateCards .candidate-card").length,
-    50,
+    595,
   );
-  assert.equal(d.querySelectorAll("#ranking li").length, 150);
-  assert.match(d.getElementById("resultCount").textContent, /1–50 de 595/);
+  assert.equal(d.querySelectorAll("#ranking li").length, 556);
+  assert.match(d.getElementById("resultCount").textContent, /1–595 de 595/);
+  assert.equal(d.getElementById("next").disabled, true);
+  d.getElementById("pageSize").value = "150";
+  d.getElementById("pageSize").dispatchEvent(new w.Event("change"));
   d.getElementById("next").click();
   assert.equal(
     d.querySelectorAll("#candidateCards .candidate-card").length,
-    50,
+    150,
   );
-  assert.match(d.getElementById("resultCount").textContent, /51–100 de 595/);
+  assert.match(d.getElementById("resultCount").textContent, /151–300 de 595/);
   d.getElementById("prev").click();
   d.getElementById("pageSize").value = "50";
   d.getElementById("pageSize").dispatchEvent(new w.Event("change"));
@@ -214,7 +217,7 @@ const tick = () => new Promise((resolve) => setTimeout(resolve, 50));
   await tick();
   assert.equal(
     desktop.window.document.querySelectorAll("#tbody tr").length,
-    50,
+    595,
   );
   assert.equal(
     desktop.window.document.querySelectorAll("#candidateCards .candidate-card")
