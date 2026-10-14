@@ -1,5 +1,5 @@
 <!doctype html>
-<html data-recovery="true" lang="pt-BR" data-release="af8653c15819d0d9">
+<html data-recovery="true" lang="pt-BR" data-release="acf293ad40048d69">
   <head>
     <meta charset="utf-8" />
     <meta
@@ -10,8 +10,9 @@
       name="description"
       content="Consulte os votos, perfis e municípios das candidaturas a deputado estadual de Goiás em 2026. Dados do TSE, favoritos, comparação e consulta offline."
     />
+    <link rel="canonical" href="https://pabloguilherme1121.github.io/eleicoes-goias-2026/" />
     <meta name="theme-color" content="#0b1420" />
-    <link rel="manifest" href="manifest.webmanifest?v=af8653c15819d0d9" />
+    <link rel="manifest" href="manifest.webmanifest?v=acf293ad40048d69" />
     <link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-title" content="Goiás 2026" />
@@ -22,11 +23,13 @@
       content="Consulte candidaturas, votos e distribuição territorial em Goiás. Base TSE de 13/10/2026."
     />
     <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://pabloguilherme1121.github.io/eleicoes-goias-2026/" />
+    <meta property="og:image" content="https://pabloguilherme1121.github.io/eleicoes-goias-2026/icons/icon-512.png" />
     <title>Goiás 2026 · Observatório Eleitoral</title>
-    <link rel="stylesheet" href="styles.css?v=af8653c15819d0d9" />
-    <script src="model.js?v=af8653c15819d0d9" defer></script>
-    <script src="app.js?v=af8653c15819d0d9" defer></script>
-    <script src="pwa.js?v=af8653c15819d0d9" defer></script>
+    <link rel="stylesheet" href="styles.css?v=acf293ad40048d69" />
+    <script src="model.js?v=acf293ad40048d69" defer></script>
+    <script src="app.js?v=acf293ad40048d69" defer></script>
+    <script src="pwa.js?v=acf293ad40048d69" defer></script>
   </head>
   <body>
     <a class="skip" href="#consulta">Ir para a consulta</a>
@@ -95,7 +98,7 @@
             ><small id="nonElectedNote"></small>
           </article>
           <article>
-            <strong id="totalUnknown">—</strong><span>sem resultado</span>
+            <strong id="totalUnknown">—</strong><span>sem resultado eleitoral</span><small id="noVotesNote"></small>
           </article>
         </section>
         <section
@@ -307,9 +310,9 @@
           <div class="result-tools">
             <label class="page-size-control"
               >Por página<select id="pageSize">
-                <option value="50">50</option>
+                <option value="50" selected>50</option>
                 <option value="100">100</option>
-                <option value="150" selected>150</option>
+                <option value="150">150</option>
               </select></label
             >
             <label class="sort-control"
@@ -655,6 +658,7 @@
         </button>
       </div>
       <div id="profileSummary" class="profile-summary"></div>
+      <p id="profileLegalNotice" class="legal-notice" role="note" hidden></p>
       <section
         class="profile-territory"
         aria-labelledby="profileTerritoryTitle"
