@@ -42,3 +42,20 @@ Abra http://127.0.0.1:8765/. O painel carrega JSON via fetch, portanto precisa d
 ## Publicação
 
 GitHub Pages: branch main, pasta raiz /. JavaScript, CSS e dados usam caminhos relativos compatíveis com o Pages.
+
+## Mobile e arquivos para baixar
+
+A estrutura se inspira no Observatório Público de Águas Lindas (https://github.com/Pabloguilherme01/observatorio): entradas por tarefa, navegação inferior, fonte e período visíveis, leitura explicada e controles de tema e contraste. Implementação própria para o painel eleitoral.
+
+No celular, a consulta usa cartões em vez da tabela. Filtros avançados ficam em um grupo expansível; a comparação mantém até três perfis entre páginas. As preferências são salvas localmente quando o navegador permite. A consulta filtrada pode ser compartilhada por URL, sem incluir dados privados.
+
+Para gerar os arquivos:
+
+```powershell
+python scripts/build_downloads.py
+```
+
+- `downloads/painel-goias-2026-offline.html`: arquivo único, com estilos, JavaScript e base embutidos. Abra diretamente no navegador, sem servidor. No celular, use um aplicativo/navegador que permita abrir HTML local.
+- `downloads/eleicoes-goias-2026.zip`: código, dados, importador, gerador e HTML offline. Extraia e abra o HTML offline para consultar; use o servidor HTTP para desenvolver a versão modular.
+
+Links às fontes oficiais exigem internet. O CSV exporta o recorte inteiro; o JSON exporta a base e a origem dos dados. Os perfis também podem ser baixados individualmente em JSON. Tema, contraste e leitura funcionam na versão offline.
