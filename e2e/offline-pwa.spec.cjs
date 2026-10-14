@@ -5,6 +5,7 @@ const { test, expect } = require("@playwright/test");
 test("PWA mantém candidatura, perfil e dados eleitorais após perder conexão", async ({
   page,
   context,
+  browserName,
 }) => {
   test.setTimeout(90_000);
   await page.setViewportSize({ width: 390, height: 780 });
@@ -38,10 +39,20 @@ test("PWA mantém candidatura, perfil e dados eleitorais após perder conexão",
     )
     .toBe(true);
 
-  await context.setOffline(true);
+  // Limitação do emulador WebKit: setOffline(true) falha na navegação
+  // controlada por service worker antes de entregar a resposta do cache.
+  // Para WebKit, abortamos apenas requisições de rede e comprovamos que a
+  // navegação foi respondida pelo service worker (não equivale a WebAPK físico).
+  const webkitNetworkFailure = browserName === "webkit";
+  if (webkitNetworkFailure)
+    await context.route("**/*", (route) => route.abort("internetdisconnected"));
+  else
+    await context.setOffline(true);
+
   try {
     // O caminho indexado no GitHub Pages é a mesma navegação de origem com query.
-    await page.goto("/?q=CAROL%20AMILTINHO#consulta");
+    const navigation = await page.goto("/?q=CAROL%20AMILTINHO#consulta");
+    expect(navigation?.fromServiceWorker()).toBe(true);
     await expect(page.locator("#content")).toBeVisible();
     await expect(page.locator("#candidateCards .candidate-card")).toHaveCount(1);
     await expect(page.locator("#ranking li")).toHaveCount(556);
@@ -53,6 +64,7 @@ test("PWA mantém candidatura, perfil e dados eleitorais após perder conexão",
     await expect(page.locator("#profile")).toBeVisible();
     await expect(page.locator("#profileName")).toContainText(/Carol/i);
   } finally {
-    await context.setOffline(false);
+    if (webkitNetworkFailure) await context.unroute("**/*");
+    else await context.setOffline(false);
   }
 });
