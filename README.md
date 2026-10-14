@@ -59,3 +59,13 @@ python scripts/build_downloads.py
 - `downloads/eleicoes-goias-2026.zip`: código, dados, importador, gerador e HTML offline. Extraia e abra o HTML offline para consultar; use o servidor HTTP para desenvolver a versão modular.
 
 Links às fontes oficiais exigem internet. O CSV exporta o recorte inteiro; o JSON exporta a base e a origem dos dados. Os perfis também podem ser baixados individualmente em JSON. Tema, contraste e leitura funcionam na versão offline.
+
+## Aplicativo PWA
+
+Abra o site publicado por HTTPS e aguarde “Consulta offline pronta neste aparelho”. O aplicativo salva a interface, ícones e os 595 registros localmente. Consulta, filtros, perfis, comparação e exportação CSV/JSON gerada localmente funcionam sem conexão. Links às fontes, compartilhamento com outras pessoas e downloads de ZIP/HTML publicados exigem internet.
+
+Android/Chrome e Edge: use o botão Instalar aplicativo quando o navegador o disponibilizar, ou o menu de instalação. iPhone/iPad: Safari → Compartilhar → Adicionar à Tela de Início. A disponibilidade da instalação depende do navegador. A instalação nunca é disparada automaticamente.
+
+Atualizações: um novo cache é preparado integralmente antes de substituir o anterior. O botão Atualizar aplicativo ativa a versão nova e recarrega os clientes controlados. O cache é isolado sob /eleicoes-goias-2026/ e não modifica outros sites da conta. Versões antigas ficam ativas até a troca, para manter HTML, JavaScript e dados consistentes. O aplicativo é uma fotografia estática dos dados, não um sistema de apuração ao vivo.
+
+Execute `python scripts/build_downloads.py` após alterar interface, PWA ou dados: o comando também versiona o service worker pelo conteúdo. Para testar localmente, use localhost/127.0.0.1 com o servidor HTTP. HTML aberto como arquivo é a entrega offline independente; não instala service worker.

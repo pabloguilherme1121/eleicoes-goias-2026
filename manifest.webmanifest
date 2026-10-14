@@ -1,0 +1,21 @@
+{
+  "id": "./",
+  "name": "Observatório Eleitoral · Goiás 2026",
+  "short_name": "Goiás 2026",
+  "description": "Candidaturas, votos, perfis e municípios de Goiás. Consulta offline após o primeiro acesso.",
+  "lang": "pt-BR",
+  "start_url": "./?origem=pwa#inicio",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#08121e",
+  "theme_color": "#08121e",
+  "icons": [
+    {"src":"icons/icon-192.png","sizes":"192x192","type":"image/png","purpose":"any"},
+    {"src":"icons/icon-512.png","sizes":"512x512","type":"image/png","purpose":"any"},
+    {"src":"icons/maskable-512.png","sizes":"512x512","type":"image/png","purpose":"maskable"}
+  ],
+  "shortcuts": [
+    {"name":"Candidaturas eleitas","short_name":"Eleitos","url":"./?view=elected#consulta"},
+    {"name":"Não eleitos e suplentes","short_name":"Não eleitos","url":"./?view=non#consulta"}
+  ]
+}
