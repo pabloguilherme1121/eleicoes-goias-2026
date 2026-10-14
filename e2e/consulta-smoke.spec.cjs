@@ -43,6 +43,9 @@ test("registros sem votação e paginação sobrevivem ao recarregamento", async
   await expect(page.locator("#dataFilter")).toHaveValue("missingVotes");
   await expect(page.locator("#candidateCards .candidate-card")).toHaveCount(39);
   await expect(page.locator("#ranking li")).toHaveCount(556);
+  // O campo fica recolhido no mobile; abrir a seção como usuário.
+  await page.locator(".filter-panel summary").click();
+  await expect(page.locator(".filter-panel")).toHaveAttribute("open", "");
   await page.locator("#dataFilter").selectOption("");
   await expect(page.locator("#candidateCards .candidate-card")).toHaveCount(595);
   await page.locator("#pageSize").selectOption("50");
