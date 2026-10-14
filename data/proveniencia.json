@@ -22,5 +22,13 @@
     }
   ],
   "registros": 595,
-  "comVotacao": 556
+  "comVotacao": 556,
+  "territorio": {
+    "fonte": "https://servicodados.ibge.gov.br/api/v1/localidades/estados/52/municipios",
+    "consultadoEm": "2026-10-14",
+    "municipiosCorrespondidos": 246,
+    "criterio": "Regiões geográficas imediatas e intermediárias do IBGE; nomes únicos normalizados; Bom Jesus (TSE) corresponde a Bom Jesus de Goiás (IBGE).",
+    "arquivo": "territorios-ibge.json",
+    "sha256": "a51ff1910c8b5375ed27a9b023ced5a46e524488ad1625ebf696ece9e6073e5c"
+  }
 }

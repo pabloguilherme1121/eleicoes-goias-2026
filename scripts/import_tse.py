@@ -80,8 +80,10 @@ assert not (set(votes)-set(cad)), 'Votação sem cadastro correspondente'
 payload=dict(meta=dict(ano=2026,uf='GO',cargo='Deputado estadual',turno=1,cadastroGerado=next(iter(cad.values()))['DT_GERACAO']+' '+next(iter(cad.values()))['HH_GERACAO'],votacaoGerada=sorted(generation),fontes=['https://dadosabertos.tse.jus.br/dataset/candidatos-2026','https://dadosabertos.tse.jus.br/dataset/resultados-2026'],observacao='Votação nominal agregada por candidato, município e zona. Sem registro de votação é diferente de zero votos. Suplentes não estão entre os 41 eleitos. Idade na data da eleição.'),candidatos=result)
 payload['meta']['geracaoComplementar']=extra_dates
 payload['municipios']=[dict(nome=name,codigo=city_codes[name],votosNominais=sum(v[name] for v in cities.values())) for name in city_names]
+from enrich_regions import enrich
+payload=enrich(payload)
 out=Path(__file__).resolve().parents[1]/'data'
 out.mkdir(exist_ok=True)
 (out/'candidatos.json').write_text(json.dumps(payload,ensure_ascii=False,separators=(',',':')),encoding='utf8',newline='\n')
-(out/'proveniencia.json').write_text(json.dumps(dict(fontes=payload['meta']['fontes'],arquivos=[dict(nome=Path(p).name,sha256=hashlib.sha256(Path(p).read_bytes()).hexdigest()) for p in sys.argv[1:]],registros=len(result),comVotacao=sum(r['votos'] is not None for r in result)),indent=2),encoding='utf8',newline='\n')
+(out/'proveniencia.json').write_text(json.dumps(dict(territorio=payload['meta']['territorio'],fontes=payload['meta']['fontes'],arquivos=[dict(nome=Path(p).name,sha256=hashlib.sha256(Path(p).read_bytes()).hexdigest()) for p in sys.argv[1:]],registros=len(result),comVotacao=sum(r['votos'] is not None for r in result)),indent=2),encoding='utf8',newline='\n')
 print(json.dumps(dict(registros=len(result),situacoes=dict(collections.Counter(r['situacao'] for r in result)),comVotacao=sum(r['votos'] is not None for r in result)),ensure_ascii=True))

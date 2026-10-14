@@ -17,3 +17,5 @@ Manter nome, dados reais do TSE, origem e datas, situação eleitoral estadual, 
 Busca e primeiro resultado acessíveis rapidamente no celular; instalação separada da exportação; salvar arquivos com ação explícita e alternativa de compartilhamento; recuperação de falhas sem apagar favoritos; código organizado e verificações reproduzíveis. A abertura de um WebAPK pelo Android exige validação no aparelho do proprietário e não pode ser prometida a partir de um teste desktop.
 
 Atualização de escopo: o usuário pediu remover download de HTML e exportação CSV. A interface passa a priorizar consulta, análise, perfis e PWA; arquivos de exportação e seus geradores foram retirados.
+
+Leitura territorial autorizada: filtro por regiões imediatas/intermediárias do IBGE, concentração municipal/regional, comparação no recorte e resumos objetivos. Não inferir residência a partir da votação; UF de nascimento e ausência de domicílio devem ser explícitas. Continuar sem downloads HTML e exportações CSV.

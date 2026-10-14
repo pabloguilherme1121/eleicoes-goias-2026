@@ -20,6 +20,7 @@ python -m http.server 8000
 python scripts/check_data.py
 python scripts/build_pwa.py
 node scripts/test_pwa.cjs
+node scripts/test_regions.cjs
 ```
 
 Após qualquer alteração de interface ou dados, gere novamente o worker com `build_pwa.py`. O script calcula a versão e a integridade dos recursos necessários ao modo offline. Publique todos os arquivos da mesma versão juntos.
@@ -41,3 +42,20 @@ Datas de geração e hashes de origem estão em `data/candidatos.json` e `data/p
 Abra o site por HTTPS e aguarde a confirmação de que a consulta offline está pronta. Consulta, filtros, perfis, favoritos e comparação funcionam com os arquivos salvos. Fontes externas exigem internet. Atualizações dependem de conexão e devem ser aplicadas pelo controle de atualização do site.
 
 A instalação é fornecida pelo navegador. A ajuda do aplicativo explica as alternativas no Android e no iPhone. Testes de cache e navegador não substituem a validação da instalação no aparelho real.
+
+## Leitura territorial
+
+Municípios do TSE são associados a 246 municípios do IBGE, com 22 regiões geográficas imediatas e 6 intermediárias. O retrato oficial de localidades foi consultado em 14/10/2026 e está em `data/territorios-ibge.json`, com URL, data e hash da resposta de origem. As três variações de nomes são tratadas por normalização de acentos/apóstrofos/espaços e pelo alias explícito Bom Jesus → Bom Jesus de Goiás. O importador falha se faltar município ou houver correspondência duplicada.
+
+```sh
+python scripts/enrich_regions.py
+python scripts/check_data.py
+node scripts/test_regions.cjs
+python scripts/build_pwa.py
+```
+
+O importador eleitoral também aplica esse enriquecimento após gerar os municípios. A base territorial permanece local no aplicativo e não exige consulta ao IBGE durante o uso.
+
+Um município selecionado é o recorte mais específico; sem município, a região escolhida agrega votos de seus municípios. O percentual na consulta usa o total nominal do território. Já os percentuais de cidades/regiões no perfil usam o total estadual de votos da própria candidatura. As três cidades mais votadas medem concentração de votos, sem inferir domicílio, apoio exclusivo ou vínculo pessoal.
+
+A classificação regional é do IBGE, não das regiões de planejamento do Governo de Goiás. A UF de nascimento vem do cadastro eleitoral; município de residência não consta no arquivo usado. As datas de votação permanecem as originais do TSE. A URL compartilha a região, código IBGE do município, busca, ordenação, página e filtro com votos; links antigos com índice municipal ainda são aceitos.
