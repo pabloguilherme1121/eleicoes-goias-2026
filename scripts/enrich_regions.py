@@ -3,6 +3,7 @@ Usa o retrato público versionado; correspondência por nome único e aliases ex
 """
 import json, unicodedata, hashlib
 from pathlib import Path
+from ranking import rank_candidates
 ROOT = Path(__file__).resolve().parents[1]
 ALIASES = {'BOM JESUS': 'BOM JESUS DE GOIAS'}
 
@@ -24,6 +25,9 @@ def enrich(payload):
         city.update(codigoIbge=match['ibge'],nomeIbge=match['nome'],regiaoImediata=match['imediata'],regiaoIntermediaria=match['intermediaria'])
     assert len(matched) == 246, 'Cobertura territorial incompleta'
     payload['meta']['territorio'] = dict(fonte=source['fonte'],consultadoEm=source['consultadoEm'],municipiosCorrespondidos=len(matched),criterio='Regiões geográficas imediatas e intermediárias do IBGE; nomes únicos normalizados; Bom Jesus (TSE) corresponde a Bom Jesus de Goiás (IBGE).',arquivo='territorios-ibge.json',sha256=hashlib.sha256(path.read_bytes()).hexdigest())
+    # Esta é a última transformação do importador antes de gravar o snapshot.
+    # Recalcule a posição nominal: zero votos tem ranking; ausência de registro, não.
+    rank_candidates(payload['candidatos'])
     return payload
 
 if __name__ == '__main__':
