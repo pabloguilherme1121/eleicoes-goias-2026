@@ -72,3 +72,5 @@ npm test
 ```
 
 As dependências são apenas de desenvolvimento. O site publicado continua estático e sem bibliotecas externas de execução. O teste de interação verifica links diretos, histórico, filtros, comparação e a preparação completa da impressão; não representa uma validação da janela de impressão ou da instalação física no Android.
+
+Comparações podem ser compartilhadas pelo parâmetro `comparar`, com até três identificadores únicos e válidos. Minha cidade guarda apenas o código IBGE da cidade escolhida no navegador, mediante ação explícita; não usa geolocalização nem altera automaticamente os filtros de links recebidos. A ordenação fica visível na consulta e a legenda da tabela acompanha a escolha.

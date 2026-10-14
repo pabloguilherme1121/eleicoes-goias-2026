@@ -58,6 +58,9 @@ try {
 } catch {}
 let favoritesPersisted = true;
 const selected = new Set();
+let comparisonSignature = "";
+let savedCityCode = preference("city") || "",
+  cityIsPersistent = true;
 function pageSize() {
   return window.matchMedia?.("(max-width:760px)").matches ? 10 : 25;
 }
@@ -216,12 +219,25 @@ function render() {
     .forEach((b) => b.setAttribute("aria-pressed", b.dataset.view === view));
   $("favoriteCount").textContent =
     `${favorites.size} ${favoritesPersisted ? "salvos no aparelho" : "nesta sessão"}`;
+  refreshSavedCity();
+  $("candidatesCaption").textContent =
+    `Candidaturas em ${scope.label}, ordenadas por ${$("sort").selectedOptions[0].textContent.toLocaleLowerCase("pt-BR")}. Ranking nominal considera todo o território.`;
   renderActiveFilters();
   renderComparison();
   renderAnalysis();
   syncUrl();
 }
 function renderComparison() {
+  const signature = JSON.stringify([
+    Array.from(selected),
+    $("regionFilter").value,
+    $("municipalityFilter").value,
+  ]);
+  if (signature !== comparisonSignature) {
+    $("comparisonStatus").textContent = "";
+    $("comparisonFallback").hidden = true;
+    comparisonSignature = signature;
+  }
   $("compare").hidden = selected.size === 0;
   $("compareJump").hidden = selected.size === 0;
   document.querySelectorAll("[data-compare]").forEach((input) => {
@@ -236,7 +252,7 @@ function renderComparison() {
         .map(([k, v]) => `<div><dt>${k}</dt><dd>${esc(v)}</dd></div>`)
         .join(
           "",
-        )}</dl><button data-remove="${c.id}">Remover</button></article>`;
+        )}</dl><div class="comparison-actions"><button data-profile="${c.id}">Abrir perfil</button><button data-remove="${c.id}" aria-label="Remover ${esc(c.nome)} da comparação">Remover</button></div></article>`;
     })
     .join("");
   $("compareHint").textContent =
@@ -423,11 +439,13 @@ document.addEventListener("change", (e) => {
       e.target.checked = false;
       $("compareHint").textContent =
         "Limite de 3 perfis. Remova um candidato para incluir outro.";
+      $("compareTrayCount").textContent = "Limite de 3 perfis";
       return;
     }
     selected.add(id);
   } else selected.delete(id);
   renderComparison();
+  syncUrl();
 });
 [
   "search",
@@ -519,6 +537,7 @@ function queryValues() {
   return {
     perfil: $("profile").open ? currentProfile?.id || "" : "",
     favoritos: $("favoritesOnly").checked ? "1" : "",
+    comparar: [...selected].join(","),
     view: view === "all" ? "" : view,
     q: $("search").value.trim(),
     party: $("partyFilter").value,
@@ -575,6 +594,11 @@ function restoreFilters() {
     $("municipalityFilter").value = city;
   $("withVotesOnly").checked = params.get("comvotos") === "1";
   $("favoritesOnly").checked = params.get("favoritos") === "1";
+  selected.clear();
+  for (const id of (params.get("comparar") || "").split(",")) {
+    if (selected.size === 3) break;
+    if (model.byId.has(id)) selected.add(id);
+  }
 }
 $("shareFilters").addEventListener("click", async () => {
   const url = new URL(
@@ -966,7 +990,7 @@ function renderActiveFilters() {
     )
     .join("");
   $("activeFilters").hidden = items.length === 0;
-  $("filterCount").textContent=`${items.length} filtros ativos`;
+  $("filterCount").textContent = `${items.length} filtros ativos`;
 }
 function clearFilter(id) {
   page = 1;
@@ -1086,4 +1110,84 @@ window.addEventListener("afterprint", () => {
   );
   renderProfileCities();
   printState = null;
+});
+
+function refreshSavedCity() {
+  const city = municipalities.find(
+    (m) => String(m.codigoIbge) === savedCityCode,
+  );
+  $("saveCity").hidden =
+    !currentCity() ||
+    (String(currentCity().codigoIbge) === savedCityCode && cityIsPersistent);
+  $("saveCity").disabled =
+    !currentCity() ||
+    (String(currentCity().codigoIbge) === savedCityCode && cityIsPersistent);
+  $("cityShortcuts").hidden =
+    !currentCity() && !city && !$("cityStatus").textContent;
+  $("restoreCity").hidden = !city;
+  $("forgetCity").hidden = !city;
+  if (city)
+    $("restoreCity").textContent =
+      `${cityIsPersistent ? "Minha cidade" : "Cidade nesta sessão"}: ${city.nomeIbge}`;
+}
+$("saveCity").addEventListener("click", () => {
+  const city = currentCity();
+  if (!city) return;
+  savedCityCode = String(city.codigoIbge);
+  try {
+    localStorage.setItem("goias-city", savedCityCode);
+    cityIsPersistent = true;
+    $("cityStatus").textContent =
+      "Cidade salva neste navegador. Use Minha cidade para voltar ao recorte.";
+  } catch {
+    cityIsPersistent = false;
+    $("cityStatus").textContent =
+      "Cidade guardada apenas nesta sessão; o navegador bloqueou o armazenamento.";
+  }
+  refreshSavedCity();
+});
+$("restoreCity").addEventListener("click", () => {
+  const index = municipalities.findIndex(
+    (m) => String(m.codigoIbge) === savedCityCode,
+  );
+  if (index < 0) return;
+  chooseTerritory("", String(index));
+  $("cityStatus").textContent =
+    "Consulta aberta na cidade escolhida. A situação eleitoral permanece estadual.";
+});
+$("forgetCity").addEventListener("click", () => {
+  try {
+    localStorage.removeItem("goias-city");
+    savedCityCode = "";
+    cityIsPersistent = true;
+    $("cityStatus").textContent =
+      "Cidade removida das preferências. O recorte atual foi mantido.";
+    refreshSavedCity();
+  } catch {
+    $("cityStatus").textContent =
+      "Não foi possível remover a preferência. Você ainda pode mudar o recorte.";
+  }
+});
+$("shareComparison").addEventListener("click", async () => {
+  if (!selected.size) return;
+  const url = new URL(
+    "https://pabloguilherme1121.github.io/eleicoes-goias-2026/",
+  );
+  for (const [key, value] of Object.entries(queryValues()))
+    if (value && key !== "perfil" && key !== "favoritos")
+      url.searchParams.set(key, value);
+  url.hash = "compare";
+  try {
+    await navigator.clipboard.writeText(url.href);
+    $("comparisonStatus").textContent =
+      "Link copiado com os perfis e o recorte territorial.";
+    $("comparisonFallback").hidden = true;
+  } catch {
+    $("comparisonFallback").hidden = false;
+    $("comparisonLink").value = url.href;
+    $("comparisonLink").focus();
+    $("comparisonLink").select();
+    $("comparisonStatus").textContent =
+      "Copie o link selecionado para compartilhar a comparação.";
+  }
 });

@@ -21,3 +21,5 @@ Atualização de escopo: o usuário pediu remover download de HTML e exportaçã
 Leitura territorial autorizada: filtro por regiões imediatas/intermediárias do IBGE, concentração municipal/regional, comparação no recorte e resumos objetivos. Não inferir residência a partir da votação; UF de nascimento e ausência de domicílio devem ser explícitas. Continuar sem downloads HTML e exportações CSV.
 
 Refinamento funcional: perfis compartilháveis por identificador, navegação sequencial e histórico do navegador, filtros removíveis, comparação persistente, impressão municipal completa e validação automática de dados/cache/interações. Dados e denominações territoriais permanecem factuais.
+
+Atalhos de cidade e comparações: guardar a cidade apenas por ação explícita, informar falha de armazenamento, manter preferências locais fora dos links compartilhados, restaurar até três identificadores únicos válidos e explicar a ordenação corrente.

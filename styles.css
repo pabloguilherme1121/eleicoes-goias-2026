@@ -1708,3 +1708,89 @@ body {
     margin-top: 8px;
   }
 }
+.city-shortcuts {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 12px 0;
+}
+.city-shortcuts button {
+  font-size: 12px;
+  max-width: 100%;
+  text-align: left;
+}
+.city-shortcuts p {
+  width: 100%;
+  margin: 4px 0;
+}
+.city-shortcuts p:empty {
+  display: none;
+}
+.sort-control {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  order: 2;
+  color: var(--muted);
+}
+.sort-control select {
+  width: auto;
+  min-width: 130px;
+}
+.result-tools #resultCount {
+  order: 0;
+}
+.result-tools .check-label {
+  order: 1;
+}
+.comparison-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 14px 0;
+}
+.comparison-actions button {
+  font-size: 12px;
+}
+.compare-card .comparison-actions {
+  margin-bottom: 0;
+}
+.compare-card .comparison-actions button {
+  flex: 1;
+}
+.compare-tray span {
+  white-space: normal;
+}
+@media (max-width: 760px) {
+  .result-tools {
+    justify-content: space-between;
+    gap: 8px;
+  }
+  .sort-control {
+    font-size: 11px;
+    gap: 5px;
+  }
+  .sort-control select {
+    min-width: 120px;
+    font-size: 12px;
+    padding: 8px;
+  }
+  .result-tools .check-label {
+    flex: none;
+  }
+  .city-shortcuts button {
+    font-size: 12px;
+    min-height: 44px;
+  }
+  .city-shortcuts #restoreCity {
+    flex: 1;
+  }
+  .comparison-actions > button {
+    flex: 1;
+  }
+  .compare-tray span {
+    max-width: 95px;
+  }
+}

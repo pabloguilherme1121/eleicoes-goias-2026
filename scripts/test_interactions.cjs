@@ -77,7 +77,7 @@ const tick = () => new Promise((resolve) => setTimeout(resolve, 50));
   }
   assert.equal(boxes[3].checked, false);
   assert.equal(d.getElementById("compareTray").hidden, false);
-  assert.match(d.getElementById("compareTrayCount").textContent, /3\/3/);
+  assert.match(d.getElementById("compareTrayCount").textContent, /Limite de 3/);
   d.getElementById("clearCompareTray").click();
   assert.equal(d.getElementById("compareTray").hidden, true);
   d.getElementById("search").value = "zz-no-match-zz";
@@ -107,7 +107,54 @@ const tick = () => new Promise((resolve) => setTimeout(resolve, 50));
     d.querySelectorAll("#export,#downloadCsv,[data-remote-file]").length,
     0,
   );
+
+  assert.equal(d.getElementById("compareCards").children.length, 0);
   dom.window.close();
+  const ids = data.candidatos.slice(0, 4).map((c) => c.id);
+  const linked = setup(
+      `https://example.test/?cidade=5200258&comparar=${ids[0]},${ids[0]},invalid,${ids[1]},${ids[2]},${ids[3]}`,
+    ),
+    lw = linked.window,
+    ld = lw.document;
+  await tick();
+  assert.equal(ld.getElementById("compareCards").children.length, 3);
+  assert.match(ld.getElementById("compareCards").textContent, /Águas Lindas/);
+  ld.getElementById("shareComparison").click();
+  await tick();
+  assert.equal(ld.getElementById("comparisonFallback").hidden, false);
+  const link = new URL(ld.getElementById("comparisonLink").value);
+  assert.equal(link.hash, "#compare");
+  assert.equal(link.searchParams.get("comparar"), ids.slice(0, 3).join(","));
+  assert.equal(link.searchParams.get("cidade"), "5200258");
+  assert(!link.searchParams.has("favoritos"));
+  ld.getElementById("saveCity").click();
+  assert.equal(lw.localStorage.getItem("goias-city"), "5200258");
+  assert.equal(ld.getElementById("restoreCity").hidden, false);
+  ld.querySelector('[data-clear-filter="municipalityFilter"]').click();
+  assert.equal(ld.getElementById("municipalityFilter").value, "");
+  ld.getElementById("restoreCity").click();
+  assert.equal(
+    ld.getElementById("municipalityFilter").value,
+    String(data.municipios.findIndex((m) => m.codigoIbge === 5200258)),
+  );
+  ld.getElementById("sort").value = "name";
+  ld.getElementById("sort").dispatchEvent(new lw.Event("change"));
+  assert.match(ld.getElementById("candidatesCaption").textContent, /nome/);
+  ld.getElementById("forgetCity").click();
+  assert.equal(lw.localStorage.getItem("goias-city"), null);
+  assert.equal(ld.getElementById("restoreCity").hidden, true);
+  ld.getElementById("clearComparison").click();
+  assert(!new URL(lw.location.href).searchParams.has("comparar"));
+  lw.Storage.prototype.setItem = function () {
+    throw new Error("Storage blocked");
+  };
+  ld.getElementById("saveCity").click();
+  assert.match(
+    ld.getElementById("cityStatus").textContent,
+    /apenas nesta sessão/,
+  );
+  linked.window.close();
+
   console.log(
     "PASS: links de perfil, navegação, histórico, filtros, limite de comparação, impressão completa e ausência de exportações.",
   );
