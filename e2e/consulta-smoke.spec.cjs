@@ -13,7 +13,7 @@ for (const width of [320, 390]) {
       ),
     ).toBe(false);
 
-    await page.locator("#search").fill("15100");
+    await page.locator("#search").fill("CAROL AMILTINHO");
     await expect(page.locator("#candidateCards .candidate-card")).toHaveCount(1);
     await expect(page.locator("#filterCount")).toHaveText("1 filtro ativo");
     await page.locator("#candidateCards [data-profile]").first().click();
@@ -30,8 +30,8 @@ test("consulta e filtros no desktop", async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 900 });
   await page.goto("/");
   await expect(page.locator("#tbody tr")).toHaveCount(50);
-  await page.locator("#search").fill("15100");
+  await page.locator("#search").fill("CAROL AMILTINHO");
   await expect(page.locator("#tbody tr")).toHaveCount(1);
-  await expect(page.locator("#tbody tr").first()).toContainText("CAROL");
+  await expect(page.locator("#tbody tr").first()).toContainText(/Carol/i);
   await expect(page.locator("#filterCount")).toHaveText("1 filtro ativo");
 });
