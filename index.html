@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="pt-BR" data-release="d26bd3304ba0a748">
+<html lang="pt-BR" data-release="0b3011d8bc8c4c69">
   <head>
     <meta charset="utf-8" />
     <meta
@@ -10,6 +10,7 @@
       name="description"
       content="Consulte os votos, perfis e municípios das candidaturas a deputado estadual de Goiás em 2026. Dados do TSE, favoritos, comparação e consulta offline."
     />
+    <link rel="canonical" href="https://pabloguilherme1121.github.io/eleicoes-goias-2026/" />
     <meta name="theme-color" content="#0b1420" />
     <link rel="manifest" href="manifest.webmanifest" />
     <link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
@@ -22,6 +23,8 @@
       content="Consulte candidaturas, votos e distribuição territorial em Goiás. Base TSE de 13/10/2026."
     />
     <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://pabloguilherme1121.github.io/eleicoes-goias-2026/" />
+    <meta property="og:image" content="https://pabloguilherme1121.github.io/eleicoes-goias-2026/icons/icon-512.png" />
     <title>Goiás 2026 · Observatório Eleitoral</title>
     <link rel="stylesheet" href="styles.css" />
     <script src="model.js" defer></script>
@@ -95,7 +98,7 @@
             ><small id="nonElectedNote"></small>
           </article>
           <article>
-            <strong id="totalUnknown">—</strong><span>sem resultado</span>
+            <strong id="totalUnknown">—</strong><span>sem resultado eleitoral</span><small id="noVotesNote"></small>
           </article>
         </section>
         <section
@@ -656,6 +659,7 @@
         </button>
       </div>
       <div id="profileSummary" class="profile-summary"></div>
+      <p id="profileLegalNotice" class="legal-notice" role="note" hidden></p>
       <section
         class="profile-territory"
         aria-labelledby="profileTerritoryTitle"

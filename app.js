@@ -206,17 +206,9 @@ function render() {
         .slice((page - 1) * size, page * size)
         .map(
           (c) =>
-            `<article class="candidate-card"><span class="card-rank">${rankFor(c) ? "#" + rankFor(c) + " no ranking nominal" : "Sem posição no ranking"}</span><h3>${esc(displayName(c.nome))}</h3><p class="identity">${esc(c.partido)} · Nº ${esc(c.numero)}</p><p class="candidate-bio">${candidateBio(c)}</p><span class="badge ${c.eleito ? "elected" : ""}">${esc(c.situacao)}</span><p class="candidate-territory">${territoryLabel(c)}</p><div class="card-votes"><div><small>Votos nominais</small><strong>${fmt(votesFor(c))}</strong></div><div class="percent"><small>Do total nominal</small><strong>${percentage(c)}</strong></div></div><div class="card-controls"><button data-profile="${c.id}" aria-label="Ver perfil de ${esc(c.nome)}">Ver perfil</button><label><input type="checkbox" data-compare="${c.id}" ${selected.has(c.id) ? "checked" : ""}><span>Comparar</span><span class="sr-only"> ${esc(c.nome)} (${esc(c.numero)})</span></label></div><button class="favorite-button" data-favorite="${c.id}" aria-pressed="${favorites.has(c.id)}" aria-label="${favorites.has(c.id) ? "Remover favorito" : "Salvar favorito"}: ${esc(c.nome)}">${icon("star")}${favorites.has(c.id) ? "Favorito salvo" : "Salvar favorito"}</button></article>`,
+            `<article class="candidate-card"><span class="card-rank">${rankFor(c) ? "#" + rankFor(c) + " no ranking nominal" : "Sem posição no ranking"}</span><h3>${esc(displayName(c.nome))}</h3><p class="identity">${esc(c.partido)} · Nº ${esc(c.numero)}</p><p class="candidate-bio">${candidateBio(c)}</p><span class="badge ${c.eleito ? "elected" : ""}">${esc(c.situacao)}</span><p class="candidate-territory">${territoryLabel(c)}</p><div class="card-votes"><div><small>Votos nominais</small><strong>${fmt(votesFor(c))}</strong></div><div class="percent"><small>Do total nominal do recorte</small><strong>${percentage(c)}</strong></div></div><div class="card-controls"><button data-profile="${c.id}" aria-label="Ver perfil de ${esc(c.nome)}">Ver perfil</button><label><input type="checkbox" data-compare="${c.id}" ${selected.has(c.id) ? "checked" : ""}><span>Comparar</span><span class="sr-only"> ${esc(c.nome)} (${esc(c.numero)})</span></label></div><button class="favorite-button" data-favorite="${c.id}" aria-pressed="${favorites.has(c.id)}" aria-label="${favorites.has(c.id) ? "Remover favorito" : "Salvar favorito"}: ${esc(c.nome)}">${icon("star")}${favorites.has(c.id) ? "Favorito salvo" : "Salvar favorito"}</button></article>`,
         )
         .join("");
-  $("filterCount").textContent =
-    [
-      $("partyFilter").value,
-      $("statusFilter").value,
-      $("regionFilter").value,
-      $("municipalityFilter").value,
-      $("withVotesOnly").checked,
-    ].filter(Boolean).length + " filtros ativos";
   $("mobileEmpty").hidden = found.length > 0;
   $("noResults").hidden = found.length > 0;
   $("pageInfo").textContent = `Página ${page} de ${pages}`;
@@ -272,6 +264,7 @@ function renderComparison() {
 function fields(c) {
   return [
     ["Resultado", c.situacao],
+    ["Situação do julgamento (TSE)", c.julgamento ?? "Não informada"],
     ["Votos nominais estaduais", fmt(c.votos)],
     ["Participação nominal estadual", percentage(c, true)],
     ["Idade na eleição", c.idade == null ? null : c.idade + " anos"],
@@ -306,7 +299,16 @@ function profile(id, writeHistory = true) {
   $("profileCitySearch").value = "";
   profileLimit = 20;
   $("profileSummary").innerHTML =
-    `<div><span>Votos estaduais</span><strong>${fmt(c.votos)}</strong></div><div><span>Participação nominal</span><strong>${percentage(c, true)}</strong></div><div><span>Resultado</span><strong>${esc(c.situacao)}</strong></div>`;
+    `<div><span>Votos estaduais</span><strong>${fmt(c.votos)}</strong></div><div><span>Do total nominal estadual</span><strong>${percentage(c, true)}</strong></div><div><span>Resultado</span><strong>${esc(c.situacao)}</strong></div>`;
+  const legalStatus = [];
+  if (c.julgamento && c.julgamento !== "DEFERIDO")
+    legalStatus.push("Julgamento: " + c.julgamento);
+  if (c.destinacao && c.destinacao !== "Válido")
+    legalStatus.push("Destinação dos votos: " + c.destinacao);
+  $("profileLegalNotice").hidden = legalStatus.length === 0;
+  $("profileLegalNotice").textContent = legalStatus.length
+    ? `${legalStatus.join(" · ")}. Informação da base TSE de ${meta.votacaoGerada?.[0] || meta.cadastroGerado || "data não informada"}. Verifique a situação atual na fonte oficial.`
+    : "";
   renderProfileTerritory();
   renderProfileExtras();
   document.body.classList.add("modal-open");
@@ -338,6 +340,9 @@ function overview() {
   $("totalElected").textContent = fmt(elected.length);
   $("totalNonElected").textContent = fmt(non.length);
   $("totalUnknown").textContent = fmt(unknown.length);
+  const withoutVotes = candidates.filter((c) => c.votos == null);
+  const otherStatuses = withoutVotes.filter((c) => c.situacao !== "Sem resultado informado");
+  $("noVotesNote").textContent = `${fmt(withoutVotes.length)} sem votação registrada, inclusive ${fmt(otherStatuses.length)} com outra situação eleitoral`;
   $("nonElectedNote").textContent =
     `${fmt(non.filter((c) => c.situacao === "Suplente").length)} suplentes + ${fmt(non.filter((c) => c.situacao === "Não eleito").length)} não eleitos`;
   $("dataStamp").textContent = "Fonte TSE · base de 13/10/2026";
@@ -1041,7 +1046,7 @@ function renderActiveFilters() {
     )
     .join("");
   $("activeFilters").hidden = items.length === 0;
-  $("filterCount").textContent = `${items.length} filtros ativos`;
+  $("filterCount").textContent = `${items.length} ${items.length === 1 ? "filtro ativo" : "filtros ativos"}`;
 }
 function clearFilter(id) {
   page = 1;

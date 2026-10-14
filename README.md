@@ -2,6 +2,12 @@
 
 Dashboard independente para consultar candidaturas a deputado estadual em Goiás. Base do TSE gerada em 13/10/2026; não é apuração ao vivo.
 
+## Leitura responsável dos resultados
+
+Esta base é um retrato dos arquivos oficiais gerados em **13/10/2026**, e não uma apuração ao vivo. **Situação eleitoral** e **julgamento da candidatura** são informações diferentes. Perfis com julgamento distinto de `DEFERIDO` ou votos com destinação especial recebem um aviso contextual, preservando a classificação publicada pelo TSE. Os percentuais locais usam o total dos **votos nominais** do território, não o total de votos válidos que inclui legenda.
+
+O resumo distingue **595 registros de candidatura**, **33 sem resultado eleitoral informado** e **39 sem votação registrada** (incluindo 6 classificados como não eleitos). Ausência de registro não é tratada como zero voto. A página começa exibindo as 595 candidaturas, com opção de paginação de 50, 100 ou 150 por página.
+
 ## Recursos
 
 - Consulta por nome, número, partido, situação eleitoral e município.
@@ -83,6 +89,6 @@ Comparações podem ser compartilhadas pelo parâmetro `comparar`, com até trê
 
 O gerador de PWA também atualiza `versao.json` e `consulta.html`. O CI verifica esses arquivos. O teste de recuperação cobre falha, cancelamento e confirmação do prompt, atualização em espera, versão incorreta, reparo parcial, indisponibilidade de rede e preservação das preferências. O lançamento de um WebAPK no aparelho Android precisa ser testado no próprio aparelho.
 
-Consulta completa com as 595 candidaturas exibidas por padrão no celular e desktop. O ranking inclui todos os 556 registros com votação informada, inclusive votação zero; os 39 sem votação permanecem na consulta, identificados como não informados.
+Consulta com até 150 candidaturas por página no celular e desktop, intervalo visível dos resultados e ranking com até 150 perfis. Todos os registros continuam acessíveis pela paginação e filtros.
 
-Filtros adicionais: faixa etária, disponibilidade de bens/redes, ausência de votação estadual e faixa de votos no recorte. A busca combina palavras em qualquer ordem e inclui ocupação e escolaridade. Idade e ocupação passam a aparecer diretamente nos resultados. O usuário pode escolher todos os registros ou páginas de 50, 100 ou 150; links preservam esses controles. Não foram inventados candidatos ou acrescentadas estimativas à base de 595 registros.
+Filtros adicionais: faixa etária, disponibilidade de bens/redes, ausência de votação estadual e faixa de votos no recorte. A busca combina palavras em qualquer ordem e inclui ocupação e escolaridade. Idade e ocupação passam a aparecer diretamente nos resultados. O usuário pode escolher 50, 100 ou 150 registros por página; links preservam esses controles. Não foram inventados candidatos ou acrescentadas estimativas à base de 595 registros.
