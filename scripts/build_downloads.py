@@ -19,7 +19,7 @@ html = html.replace('</body>', '<script id="embeddedData" type="application/json
 portable = out/'painel-goias-2026-offline.html'
 portable.write_text(html,encoding='utf8')
 with zipfile.ZipFile(out/'eleicoes-goias-2026.zip','w',compression=zipfile.ZIP_DEFLATED) as z:
-    for name in ('index.html','app.js','styles.css','README.md','.nojekyll','data/candidatos.json','data/proveniencia.json','scripts/import_tse.py','scripts/build_downloads.py','scripts/check_downloads.py'):
+    for name in ('index.html','app.js','styles.css','README.md','.gitattributes','.nojekyll','data/candidatos.json','data/proveniencia.json','scripts/import_tse.py','scripts/build_downloads.py','scripts/check_downloads.py'):
         z.write(root/name,'eleicoes-goias-2026/'+name)
     z.write(portable,'eleicoes-goias-2026/downloads/'+portable.name)
     z.writestr('LEIA-PRIMEIRO.txt','Abra eleicoes-goias-2026/downloads/painel-goias-2026-offline.html no navegador. O HTML inclui os dados e funciona sem servidor e sem internet. Para desenvolver, siga o README.md. Links de fontes externas e compartilhamento precisam de internet.')
