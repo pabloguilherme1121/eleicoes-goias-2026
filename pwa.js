@@ -8,7 +8,7 @@
   connection();
   if(location.protocol==='file:'||document.getElementById('embeddedData')){status.textContent='Este HTML já inclui os dados offline. Para instalar o aplicativo, abra o site publicado.';install.hidden=true;check.hidden=true;repair.hidden=true;return;}
   window.addEventListener('beforeinstallprompt',event=>{event.preventDefault();prompt=event;if(!standalone())install.hidden=false;});
-  install.addEventListener('click',async()=>{if(!prompt)return;const current=prompt;prompt=null;install.hidden=true;try{await current.prompt();await current.userChoice;}catch{status.textContent='Use o menu do navegador para instalar o aplicativo.';}});
+  install.addEventListener('click',async()=>{if(!prompt){document.getElementById('installGuide').showModal();return;}const current=prompt;prompt=null;install.hidden=true;try{await current.prompt();const choice=await current.userChoice;status.textContent=choice.outcome==='accepted'?'Instalação solicitada ao navegador. Se aparecer falha ao abrir, consulte Ajuda para instalar.':'Instalação cancelada. Você pode continuar pelo navegador.';install.hidden=false;}catch{status.textContent='Use o menu do navegador para instalar o aplicativo.';}});
   window.addEventListener('appinstalled',()=>{prompt=null;install.hidden=true;status.textContent='Aplicativo instalado. A consulta está disponível na tela inicial.';});
   const onlineStatus=()=>{status.textContent=ready?(navigator.onLine?'Consulta offline pronta neste aparelho.':'Sem conexão. Consultando os dados salvos neste aparelho.'):'O modo offline ainda não foi preparado. Conecte-se e recarregue para tentar novamente.';};
   window.addEventListener('online',()=>{onlineStatus();registration?.update().catch(()=>{});});window.addEventListener('offline',onlineStatus);
@@ -29,3 +29,6 @@
   repair.addEventListener('click',async()=>{repair.disabled=true;status.textContent='Verificando e reparando arquivos offline…';try{await markReady('OFFLINE_STATUS');if(!ready&&navigator.onLine)await markReady('REPAIR_CACHE')}finally{repair.disabled=false;}});
   document.addEventListener('visibilitychange' ,()=>{if(document.visibilityState==='visible')registration?.update().catch(()=>{});});
 })();
+
+document.getElementById('installHelp').addEventListener('click',()=>document.getElementById('installGuide').showModal());
+document.getElementById('closeInstallGuide').addEventListener('click',()=>document.getElementById('installGuide').close());

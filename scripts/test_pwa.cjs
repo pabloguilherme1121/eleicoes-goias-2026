@@ -17,16 +17,17 @@ function environment(){
  return {stores,listeners,lifecycle,request,message,offline:v=>offline=v,broken:v=>broken=v,fail:v=>fail=v,claimed:()=>claimed,skipped:()=>skipped};
 }
 (async()=>{
- const e=environment();await e.lifecycle('install');const key=[...e.stores.keys()][0];assert.equal(e.stores.get(key).size,10);e.stores.set('goias-eleitoral-old',new Map());e.stores.set('other-app-cache',new Map());await e.lifecycle('activate');assert(!e.stores.has('goias-eleitoral-old'));assert(e.stores.has('other-app-cache'));assert.equal(e.claimed(),1);
+ const e=environment();await e.lifecycle('install');const key=[...e.stores.keys()][0];assert.equal(e.stores.get(key).size,12);e.stores.set('goias-eleitoral-old',new Map());e.stores.set('other-app-cache',new Map());await e.lifecycle('activate');assert(!e.stores.has('goias-eleitoral-old'));assert(e.stores.has('other-app-cache'));assert.equal(e.claimed(),1);
  e.offline(true);for(const url of ['https://example.test/eleicoes-goias-2026/?view=non&q=Lincoln','https://example.test/eleicoes-goias-2026/index.html?view=elected']){assert.equal((await e.request(url,'navigate')).status,200);}
  assert.equal((await e.request('https://example.test/eleicoes-goias-2026/data/candidatos.json')).status,200);
  assert.equal(await e.request('https://example.test/PG-portfolio/','navigate'),undefined);assert.equal(await e.request('https://external.test/'),undefined);assert.equal(await e.request('https://example.test/eleicoes-goias-2026/downloads/project.zip'),undefined);
  e.listeners.message({data:{type:'ACTIVATE_UPDATE'}});assert.equal(e.skipped(),1);
  assert.equal((await e.message('OFFLINE_STATUS')).ok,true);
  const preserved=await e.message('REPAIR_CACHE');assert.equal(preserved.ok,true);assert.equal(preserved.repairFailed,true);
- e.stores.get(key).delete('https://example.test/eleicoes-goias-2026/data/candidatos.json');assert.equal((await e.message('OFFLINE_STATUS')).ok,false);assert.equal((await e.message('REPAIR_CACHE')).ok,false);assert.equal(e.stores.get(key).size,9);
- e.offline(false);assert.equal((await e.message('REPAIR_CACHE')).ok,true);assert.equal(e.stores.get(key).size,10);
+ e.stores.get(key).delete('https://example.test/eleicoes-goias-2026/data/candidatos.json');assert.equal((await e.message('OFFLINE_STATUS')).ok,false);assert.equal((await e.message('REPAIR_CACHE')).ok,false);assert.equal(e.stores.get(key).size,11);
+ e.offline(false);assert.equal((await e.message('REPAIR_CACHE')).ok,true);assert.equal(e.stores.get(key).size,12);
  e.offline(false);e.broken(true);assert.equal((await e.request('https://example.test/eleicoes-goias-2026/app.js')).status,200);e.offline(true);assert.equal((await e.request('https://example.test/eleicoes-goias-2026/app.js')).status,503);
  const failed=environment();failed.fail('data/candidatos.json');await assert.rejects(()=>failed.lifecycle('install'));assert.equal(failed.stores.size,0);
  console.log('PASS: manifest/ícones; integridade de todos os recursos; navegação offline; isolamento; atualização; verificação, falha parcial e reparo do cache.');
 })().catch(error=>{console.error(error);process.exitCode=1;});
+

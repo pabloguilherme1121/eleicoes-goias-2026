@@ -1,0 +1,7 @@
+# Sistema visual
+
+Refinamento do observatório existente: conservar a identidade GO, azul escuro e verde; substituir a abertura promocional extensa por uma experiência de consulta compacta. Evitar gradientes e sucessivas camadas de cartões. Os números e a tipografia tabular conduzem a leitura.
+
+Tokens: fundo #0b1420, superfície #121f2e, linha #2b3d50, texto #f0f5fa, secundário #b2c2d1, ação #66dfbd. Tema claro: fundo #f4f7fa, superfície #fff, texto #183044, secundário #435c70, ação #08785c. Corpo 15px/1.55, título principal 28–36px, título de seção 21–25px. Largura máxima 1280px. Espaçamento 4/8/12/16/24/32. Raio 10–16px. Somente SVG de traço consistente para ícones.
+
+Mobile: busca primeiro, filtros expansíveis, dez resultados por página, controles com área de toque de 44px ou maior, navegação inferior com safe area. Perfil divide os detalhes em grupos expansíveis. Exportação distingue preparar arquivo, salvar arquivo, compartilhar arquivo e instalar aplicativo. Movimento breve de abertura, respeitando preferência por movimento reduzido.

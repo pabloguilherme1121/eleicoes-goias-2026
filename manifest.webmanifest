@@ -4,7 +4,7 @@
   "short_name": "Goiás 2026",
   "description": "Candidaturas, votos, perfis e municípios de Goiás. Consulta offline após o primeiro acesso.",
   "lang": "pt-BR",
-  "start_url": "./?origem=pwa#inicio",
+  "start_url": "./",
   "scope": "./",
   "display": "standalone",
   "background_color": "#08121e",
