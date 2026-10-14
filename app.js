@@ -821,9 +821,17 @@ window.addEventListener("resize", () => {
 });
 load();
 
+let previousAnalysisScope = null;
+let previousAnalysisMode = null;
 function renderAnalysis() {
   if (!model) return;
   const scope = currentScope();
+  // Filtros pessoais e busca não modificam a apuração territorial.
+  // Evita recriar centenas de nós e perder o foco nos botões do ranking.
+  if (scope === previousAnalysisScope && chartMode === previousAnalysisMode)
+    return;
+  previousAnalysisScope = scope;
+  previousAnalysisMode = chartMode;
   $("analysisScope").textContent =
     `${scope.label} · ${scope.cityCount} ${scope.cityCount === 1 ? "município" : "municípios"}`;
   const groups = new Map();

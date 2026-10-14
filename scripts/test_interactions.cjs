@@ -129,14 +129,21 @@ const tick = () => new Promise((resolve) => setTimeout(resolve, 50));
   assert.match(d.getElementById("compareTrayCount").textContent, /Limite de 3/);
   d.getElementById("clearCompareTray").click();
   assert.equal(d.getElementById("compareTray").hidden, true);
+  const rankingFirstNode = d.querySelector("#ranking li:first-child");
+  const regionFirstNode = d.querySelector("#regionOverview").firstElementChild;
   d.getElementById("search").value = "zz-no-match-zz";
   d.getElementById("search").dispatchEvent(new w.Event("input"));
   assert.equal(d.getElementById("mobileEmpty").hidden, false);
+  // Ranking e painel territorial não dependem da busca: preservar DOM e foco.
+  assert.equal(d.querySelector("#ranking li:first-child"), rankingFirstNode);
+  assert.equal(d.getElementById("regionOverview").firstElementChild, regionFirstNode);
   d.querySelector('[data-clear-filter="search"]').click();
   assert.equal(d.getElementById("search").value, "");
   assert.equal(d.getElementById("mobileEmpty").hidden, true);
   d.getElementById("regionFilter").value = "intermediaria:5206";
   d.getElementById("regionFilter").dispatchEvent(new w.Event("change"));
+  // Mudar o recorte invalida o cache dos gráficos/ranking.
+  assert.notEqual(d.querySelector("#ranking li:first-child"), rankingFirstNode);
   d.querySelector('[data-clear-filter="regionFilter"]').click();
   assert.equal(d.getElementById("regionFilter").value, "");
   assert.equal(d.getElementById("municipalityFilter").options.length, 247);
