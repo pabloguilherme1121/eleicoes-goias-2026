@@ -62,7 +62,7 @@ let comparisonSignature = "";
 let savedCityCode = preference("city") || "",
   cityIsPersistent = true;
 function pageSize() {
-  return window.matchMedia?.("(max-width:760px)").matches ? 10 : 25;
+  return 50;
 }
 function filtered() {
   return model
@@ -180,27 +180,26 @@ function render() {
     pages = Math.max(1, Math.ceil(found.length / size));
   page = Math.min(page, pages);
   $("resultCount").textContent =
-    `${fmt(found.length)} de ${fmt(candidates.length)} candidaturas · ${fmt(found.filter((c) => c.eleito).length)} eleitos na lista`;
-  $("tbody").innerHTML =
-    pageSize() === 10
-      ? ""
-      : found
-          .slice((page - 1) * size, page * size)
-          .map(
-            (c) =>
-              `<tr><td><input type="checkbox" aria-label="Comparar ${esc(c.nome)}" data-compare="${esc(c.id)}" ${selected.has(c.id) ? "checked" : ""}></td><td class="num">${rankFor(c) ?? "—"}</td><td class="name">${esc(displayName(c.nome))}<small>Nº ${esc(c.numero)} · ${esc(c.partido)}</small><small class="candidate-territory">${territoryLabel(c)}</small></td><td><span class="badge ${c.eleito ? "elected" : ""}">${esc(c.situacao)}</span></td><td class="num">${fmt(votesFor(c))}</td><td class="num">${percentage(c)}</td><td><button class="detail-button" data-profile="${esc(c.id)}">Ver perfil</button></td></tr>`,
-          )
-          .join("");
-  $("candidateCards").innerHTML =
-    pageSize() !== 10
-      ? ""
-      : found
-          .slice((page - 1) * size, page * size)
-          .map(
-            (c) =>
-              `<article class="candidate-card"><span class="card-rank">${rankFor(c) ? "#" + rankFor(c) + " no ranking nominal" : "Sem posição no ranking"}</span><h3>${esc(displayName(c.nome))}</h3><p class="identity">${esc(c.partido)} · Nº ${esc(c.numero)}</p><span class="badge ${c.eleito ? "elected" : ""}">${esc(c.situacao)}</span><p class="candidate-territory">${territoryLabel(c)}</p><div class="card-votes"><div><small>Votos nominais</small><strong>${fmt(votesFor(c))}</strong></div><div class="percent"><small>Do total nominal</small><strong>${percentage(c)}</strong></div></div><div class="card-controls"><button data-profile="${c.id}" aria-label="Ver perfil de ${esc(c.nome)}">Ver perfil</button><label><input type="checkbox" data-compare="${c.id}" ${selected.has(c.id) ? "checked" : ""}><span>Comparar</span><span class="sr-only"> ${esc(c.nome)} (${esc(c.numero)})</span></label></div><button class="favorite-button" data-favorite="${c.id}" aria-pressed="${favorites.has(c.id)}" aria-label="${favorites.has(c.id) ? "Remover favorito" : "Salvar favorito"}: ${esc(c.nome)}">${icon("star")}${favorites.has(c.id) ? "Favorito salvo" : "Salvar favorito"}</button></article>`,
-          )
-          .join("");
+    `${found.length ? fmt((page - 1) * size + 1) + "–" + fmt(Math.min(page * size, found.length)) : "0"} de ${fmt(found.length)} resultados · ${fmt(candidates.length)} registros na base · ${fmt(found.filter((c) => c.eleito).length)} eleitos na lista`;
+  $("tbody").innerHTML = window.matchMedia?.("(max-width:760px)").matches
+    ? ""
+    : found
+        .slice((page - 1) * size, page * size)
+        .map(
+          (c) =>
+            `<tr><td><input type="checkbox" aria-label="Comparar ${esc(c.nome)}" data-compare="${esc(c.id)}" ${selected.has(c.id) ? "checked" : ""}></td><td class="num">${rankFor(c) ?? "—"}</td><td class="name">${esc(displayName(c.nome))}<small>Nº ${esc(c.numero)} · ${esc(c.partido)}</small><small class="candidate-territory">${territoryLabel(c)}</small></td><td><span class="badge ${c.eleito ? "elected" : ""}">${esc(c.situacao)}</span></td><td class="num">${fmt(votesFor(c))}</td><td class="num">${percentage(c)}</td><td><button class="detail-button" data-profile="${esc(c.id)}">Ver perfil</button></td></tr>`,
+        )
+        .join("");
+  $("candidateCards").innerHTML = !window.matchMedia?.("(max-width:760px)")
+    .matches
+    ? ""
+    : found
+        .slice((page - 1) * size, page * size)
+        .map(
+          (c) =>
+            `<article class="candidate-card"><span class="card-rank">${rankFor(c) ? "#" + rankFor(c) + " no ranking nominal" : "Sem posição no ranking"}</span><h3>${esc(displayName(c.nome))}</h3><p class="identity">${esc(c.partido)} · Nº ${esc(c.numero)}</p><span class="badge ${c.eleito ? "elected" : ""}">${esc(c.situacao)}</span><p class="candidate-territory">${territoryLabel(c)}</p><div class="card-votes"><div><small>Votos nominais</small><strong>${fmt(votesFor(c))}</strong></div><div class="percent"><small>Do total nominal</small><strong>${percentage(c)}</strong></div></div><div class="card-controls"><button data-profile="${c.id}" aria-label="Ver perfil de ${esc(c.nome)}">Ver perfil</button><label><input type="checkbox" data-compare="${c.id}" ${selected.has(c.id) ? "checked" : ""}><span>Comparar</span><span class="sr-only"> ${esc(c.nome)} (${esc(c.numero)})</span></label></div><button class="favorite-button" data-favorite="${c.id}" aria-pressed="${favorites.has(c.id)}" aria-label="${favorites.has(c.id) ? "Remover favorito" : "Salvar favorito"}: ${esc(c.nome)}">${icon("star")}${favorites.has(c.id) ? "Favorito salvo" : "Salvar favorito"}</button></article>`,
+        )
+        .join("");
   $("filterCount").textContent =
     [
       $("partyFilter").value,
@@ -806,10 +805,10 @@ function renderAnalysis() {
     chartMode === "seats"
       ? "41 cadeiras estaduais. Clique em um partido para consultar seus perfis."
       : "Soma dos votos nominais por partido no recorte. Não inclui votos de legenda.";
-  $("rankingTitle").textContent = "Mais votados · " + scope.label;
+  $("rankingTitle").textContent = "Até 50 mais votados · " + scope.label;
   $("ranking").innerHTML = scope.ordered
     .filter((c) => scope.votes(c) != null)
-    .slice(0, 10)
+    .slice(0, 50)
     .map(
       (c, i) =>
         `<li><span>${i + 1}</span><button data-profile="${c.id}">${esc(c.nome)}<small>${esc(c.partido)} · ${esc(c.situacao)}</small></button><strong>${fmt(scope.votes(c))}</strong></li>`,

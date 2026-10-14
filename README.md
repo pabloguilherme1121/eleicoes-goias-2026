@@ -82,3 +82,5 @@ Comparações podem ser compartilhadas pelo parâmetro `comparar`, com até trê
 `consulta.html` é uma rota online gerada a partir da interface, com URLs dos scripts, estilo e dados identificadas pela versão. Ela permite consultar sem reutilizar os arquivos antigos conhecidos por um worker anterior. Não é um download de HTML e não promete navegação offline nessa rota. Depois da recuperação, a raiz do site oferece a consulta offline habitual.
 
 O gerador de PWA também atualiza `versao.json` e `consulta.html`. O CI verifica esses arquivos. O teste de recuperação cobre falha, cancelamento e confirmação do prompt, atualização em espera, versão incorreta, reparo parcial, indisponibilidade de rede e preservação das preferências. O lançamento de um WebAPK no aparelho Android precisa ser testado no próprio aparelho.
+
+Consulta com até 50 candidaturas por página no celular e desktop, intervalo visível dos resultados e ranking com até 50 perfis. Todos os registros continuam acessíveis pela paginação e filtros.

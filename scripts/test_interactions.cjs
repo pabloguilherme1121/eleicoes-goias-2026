@@ -33,6 +33,19 @@ const tick = () => new Promise((resolve) => setTimeout(resolve, 50));
     d = w.document;
   await tick();
   assert.equal(d.getElementById("content").hidden, false);
+  assert.equal(
+    d.querySelectorAll("#candidateCards .candidate-card").length,
+    50,
+  );
+  assert.equal(d.querySelectorAll("#ranking li").length, 50);
+  assert.match(d.getElementById("resultCount").textContent, /1–50 de 595/);
+  d.getElementById("next").click();
+  assert.equal(
+    d.querySelectorAll("#candidateCards .candidate-card").length,
+    50,
+  );
+  assert.match(d.getElementById("resultCount").textContent, /51–100 de 595/);
+  d.getElementById("prev").click();
   assert.equal(d.getElementById("profile").open, true);
   assert.equal(
     new w.URLSearchParams(w.location.search).get("perfil"),
