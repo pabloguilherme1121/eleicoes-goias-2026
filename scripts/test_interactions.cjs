@@ -142,6 +142,8 @@ const tick = () => new Promise((resolve) => setTimeout(resolve, 50));
   assert.equal(d.getElementById("mobileEmpty").hidden, true);
   d.getElementById("regionFilter").value = "intermediaria:5206";
   d.getElementById("regionFilter").dispatchEvent(new w.Event("change"));
+  // Mudar o recorte invalida o cache dos gráficos/ranking.
+  assert.notEqual(d.querySelector("#ranking li:first-child"), rankingFirstNode);
   d.querySelector('[data-clear-filter="regionFilter"]').click();
   assert.equal(d.getElementById("regionFilter").value, "");
   assert.equal(d.getElementById("municipalityFilter").options.length, 247);

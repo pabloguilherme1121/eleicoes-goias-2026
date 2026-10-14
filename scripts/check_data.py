@@ -7,6 +7,16 @@ data=json.loads((Path(__file__).resolve().parents[1]/'data/candidatos.json').rea
 cs=data['candidatos'];cities=data['municipios']
 assert len(cities)==246 and len({m['codigo'] for m in cities})==246
 assert sum(c['eleito'] for c in cs)==41
+assert len({c['id'] for c in cs})==len(cs), 'Candidaturas duplicadas'
+provenance=json.loads((Path(__file__).resolve().parents[1]/'data/proveniencia.json').read_text(encoding='utf8'))
+with_votes=[c for c in cs if c['votos'] is not None]
+missing_votes=[c for c in cs if c['votos'] is None]
+assert len(cs)==provenance['registros'], 'Total difere da proveniência'
+assert len(with_votes)==provenance['comVotacao'], 'Cobertura difere da proveniência'
+assert all(isinstance(c['votos'],int) and c['votos']>=0 for c in with_votes)
+assert [c['ranking'] for c in with_votes]==list(range(1,len(with_votes)+1)), 'Ranking nominal inconsistente'
+assert all(c['ranking'] is None for c in missing_votes), 'Ausência de votos não pode ter posição'
+assert all(a['votos']>=b['votos'] for a,b in zip(with_votes,with_votes[1:])), 'Ordenação de votos inválida'
 for c in cs:
     if c['votos'] is not None:assert sum(n for _,n in c['votacaoMunicipal'])==c['votos'],c['id']
     assert len(c['votacaoMunicipal'])==len({i for i,_ in c['votacaoMunicipal']})
