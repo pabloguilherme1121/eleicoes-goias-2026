@@ -10,6 +10,7 @@
       name="description"
       content="Consulte os votos, perfis e municípios das candidaturas a deputado estadual de Goiás em 2026. Dados do TSE, favoritos, comparação e consulta offline."
     />
+    <link rel="canonical" href="https://pabloguilherme1121.github.io/eleicoes-goias-2026/" />
     <meta name="theme-color" content="#0b1420" />
     <link rel="manifest" href="manifest.webmanifest" />
     <link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
@@ -22,6 +23,8 @@
       content="Consulte candidaturas, votos e distribuição territorial em Goiás. Base TSE de 13/10/2026."
     />
     <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://pabloguilherme1121.github.io/eleicoes-goias-2026/" />
+    <meta property="og:image" content="https://pabloguilherme1121.github.io/eleicoes-goias-2026/icons/icon-512.png" />
     <title>Goiás 2026 · Observatório Eleitoral</title>
     <link rel="stylesheet" href="styles.css" />
     <script src="model.js" defer></script>
@@ -95,7 +98,7 @@
             ><small id="nonElectedNote"></small>
           </article>
           <article>
-            <strong id="totalUnknown">—</strong><span>sem resultado</span>
+            <strong id="totalUnknown">—</strong><span>sem resultado eleitoral</span><small id="noVotesNote"></small>
           </article>
         </section>
         <section
@@ -307,9 +310,9 @@
           <div class="result-tools">
             <label class="page-size-control"
               >Por página<select id="pageSize">
-                <option value="50">50</option>
+                <option value="50" selected>50</option>
                 <option value="100">100</option>
-                <option value="150" selected>150</option>
+                <option value="150">150</option>
               </select></label
             >
             <label class="sort-control"
@@ -655,6 +658,7 @@
         </button>
       </div>
       <div id="profileSummary" class="profile-summary"></div>
+      <p id="profileLegalNotice" class="legal-notice" role="note" hidden></p>
       <section
         class="profile-territory"
         aria-labelledby="profileTerritoryTitle"
