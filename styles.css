@@ -1839,3 +1839,24 @@ body {
     font-size: 12px;
   }
 }
+
+/* Leitura jurídica explícita e hierarquia mobile. */
+.legal-notice {
+  border-left: 3px solid var(--accent);
+  border-radius: 6px;
+  background: var(--surface);
+  color: var(--text);
+  padding: 12px 16px;
+  margin: 12px 0;
+  line-height: 1.55;
+}
+@media (max-width: 480px) {
+  .metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .metrics article { min-width: 0; }
+  .metrics span { font-size: 13px; }
+  .tabs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+  .tabs button:last-child { grid-column: 1 / -1; }
+  .tabs button { font-size: 13px; min-width: 0; }
+  .candidate-card .candidate-bio,
+  .candidate-card .candidate-territory { font-size: 13px; line-height: 1.5; }
+}
