@@ -59,3 +59,16 @@ O importador eleitoral também aplica esse enriquecimento após gerar os municí
 Um município selecionado é o recorte mais específico; sem município, a região escolhida agrega votos de seus municípios. O percentual na consulta usa o total nominal do território. Já os percentuais de cidades/regiões no perfil usam o total estadual de votos da própria candidatura. As três cidades mais votadas medem concentração de votos, sem inferir domicílio, apoio exclusivo ou vínculo pessoal.
 
 A classificação regional é do IBGE, não das regiões de planejamento do Governo de Goiás. A UF de nascimento vem do cadastro eleitoral; município de residência não consta no arquivo usado. As datas de votação permanecem as originais do TSE. A URL compartilha a região, código IBGE do município, busca, ordenação, página e filtro com votos; links antigos com índice municipal ainda são aceitos.
+
+## Navegação e validação da interface
+
+O perfil tem link estável pelo parâmetro `perfil`, navegação anterior/próximo na lista atual, compartilhamento e impressão com todos os municípios. Voltar/Avançar do navegador restaura a consulta e o perfil. Os filtros ativos podem ser removidos individualmente; favoritos continuam pessoais. A comparação mantém até três candidaturas e oferece uma barra de acesso no celular.
+
+Para reproduzir os testes de interação em Node.js 24 ou superior:
+
+```sh
+npm ci
+npm test
+```
+
+As dependências são apenas de desenvolvimento. O site publicado continua estático e sem bibliotecas externas de execução. O teste de interação verifica links diretos, histórico, filtros, comparação e a preparação completa da impressão; não representa uma validação da janela de impressão ou da instalação física no Android.

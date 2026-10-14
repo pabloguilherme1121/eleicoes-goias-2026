@@ -19,3 +19,5 @@ Busca e primeiro resultado acessíveis rapidamente no celular; instalação sepa
 Atualização de escopo: o usuário pediu remover download de HTML e exportação CSV. A interface passa a priorizar consulta, análise, perfis e PWA; arquivos de exportação e seus geradores foram retirados.
 
 Leitura territorial autorizada: filtro por regiões imediatas/intermediárias do IBGE, concentração municipal/regional, comparação no recorte e resumos objetivos. Não inferir residência a partir da votação; UF de nascimento e ausência de domicílio devem ser explícitas. Continuar sem downloads HTML e exportações CSV.
+
+Refinamento funcional: perfis compartilháveis por identificador, navegação sequencial e histórico do navegador, filtros removíveis, comparação persistente, impressão municipal completa e validação automática de dados/cache/interações. Dados e denominações territoriais permanecem factuais.

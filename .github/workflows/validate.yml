@@ -1,0 +1,26 @@
+name: Validate dashboard
+on:
+  push:
+    branches: [main]
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: npm ci --ignore-scripts
+      - run: npm test
+      - run: python scripts/check_data.py
+      - name: Verify generated PWA version
+        run: |
+          python scripts/build_pwa.py
+          git diff --exit-code -- index.html service-worker.js

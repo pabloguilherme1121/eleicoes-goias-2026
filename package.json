@@ -1,0 +1,13 @@
+{
+  "name": "observatorio-eleitoral-goias",
+  "private": true,
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "test": "node scripts/test_regions.cjs && node scripts/test_interactions.cjs && node scripts/test_pwa.cjs"
+  },
+  "devDependencies": {
+    "jsdom": "30.1.2"
+  }
+}

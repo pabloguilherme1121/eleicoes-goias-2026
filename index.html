@@ -1,40 +1,821 @@
 <!doctype html>
-<html lang="pt-BR" data-release="f612bbda949b578e">
-<head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="description" content="Consulte os votos, perfis e municípios das candidaturas a deputado estadual de Goiás em 2026. Dados do TSE, favoritos, comparação e consulta offline.">
-<meta name="theme-color" content="#0b1420"><link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="icons/apple-touch-icon.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Goiás 2026">
-<title>Goiás 2026 · Observatório Eleitoral</title>
-<link rel="stylesheet" href="styles.css"><script src="model.js" defer></script><script src="app.js" defer></script><script src="pwa.js" defer></script>
-</head>
-<body>
-<a class="skip" href="#consulta">Ir para a consulta</a>
-<header class="site-header"><a class="brand" href="#inicio"><span class="brand-mark">GO</span><span>Observatório Eleitoral<small>Goiás · 2026</small></span></a><nav aria-label="Menu principal"><a href="#consulta">Consulta</a><a href="#analise">Análise</a><a href="#aplicativo">Aplicativo</a><a href="#fontes">Fontes</a></nav><a class="header-action" href="#aplicativo">Instalar app <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 2h8a2 2 0 0 1 2 2v16a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2zM10 18h4"/></svg></a></header>
-<main>
-<section class="intro" id="inicio"><div><h1>Goiás 2026.<br class="desktop-break"> O voto em perspectiva.</h1><p>Consulte as candidaturas a deputado estadual, do resultado em Goiás ao voto na sua cidade.</p></div><a class="source-stamp" id="dataStamp" href="#fontes">Fonte TSE · carregando base</a></section>
-<div id="loading" role="status" class="loading"><span class="loading-dot"></span>Carregando dados do TSE…</div><noscript><p>Ative JavaScript para consultar. A <a href="data/candidatos.json">base JSON</a> também está disponível.</p></noscript>
-<div id="content" hidden>
-<section class="metrics" aria-label="Resumo estadual"><article><strong id="totalCandidates">—</strong><span>registros</span></article><article><strong id="totalElected">—</strong><span>eleitos</span></article><article><strong id="totalNonElected">—</strong><span>suplentes e não eleitos</span><small id="nonElectedNote"></small></article><article><strong id="totalUnknown">—</strong><span>sem resultado</span></article></section>
-<section class="workspace" id="consulta" aria-labelledby="consulta-title"><div class="section-head"><div><h2 id="consulta-title">Encontre uma candidatura</h2><p>Explore perfis, resultados e presença nos municípios.</p></div><details class="preferences"><summary>Preferências <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16M8 3v6m8 0v6m-8 0v6"/></svg></summary><div><label>Leitura<select id="readingMode"><option value="summary">Direta</option><option value="explained">Com explicações</option></select></label><button id="themeToggle" aria-pressed="false">Tema claro</button><button id="contrastToggle" aria-pressed="false">Mais contraste</button></div></details></div>
-<aside class="explanation explained-only" hidden>Escolha um recorte, abra um perfil e confira fonte e data. A situação eleitoral é estadual; votos e percentuais mudam quando você seleciona uma cidade.</aside>
-<div class="search-block"><label class="sr-only" for="search">Nome ou número de urna</label><span><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 21l-5-5M18 10a8 8 0 1 1-16 0 8 8 0 0 1 16 0"/></svg></span><input type="search" id="search" placeholder="Busque por nome, número ou partido" autocomplete="off"></div>
-<div class="territory-controls" aria-label="Recorte territorial"><label>Região do IBGE<select id="regionFilter"><option value="">Todo o estado</option></select></label><label>Município<select id="municipalityFilter" aria-label="Município"><option value="">Todos os municípios</option></select></label></div><details class="city-search"><summary>Encontrar município pelo nome</summary><label class="sr-only" for="municipalitySearch">Buscar cidade para filtrar</label><input id="municipalitySearch" type="search" placeholder="Digite o nome do município"></details><div class="query-toolbar"><div class="tabs" role="group" aria-label="Recorte do resultado"><button data-view="all" aria-pressed="true">Todos</button><button data-view="elected" aria-pressed="false">Eleitos</button><button data-view="non" aria-pressed="false">Não eleitos e suplentes</button></div><details class="filter-panel"><summary><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16M8 3v6m8 0v6m-8 0v6"/></svg> Filtros <span id="filterCount">0</span></summary><div class="filters"><label>Partido<select id="partyFilter"><option value="">Todos os partidos</option></select></label><label>Situação eleitoral<select id="statusFilter"><option value="">Todas as situações</option><option>Eleito por quociente partidário</option><option>Eleito por média</option><option>Suplente</option><option>Não eleito</option><option>Sem resultado informado</option></select></label><label>Ordenação<select id="sort"><option value="votes">Mais votos</option><option value="low">Menos votos</option><option value="name">Nome (A–Z)</option></select></label><label class="check-label"><input id="withVotesOnly" type="checkbox"> Somente com votos no recorte</label><button id="clear">Limpar filtros</button></div></details></div>
-<div class="result-tools"><p id="resultCount" role="status"></p><label class="check-label"><input id="favoritesOnly" type="checkbox"> Meus favoritos <span id="favoriteCount"></span></label></div>
-<section class="scope-reading" aria-labelledby="scopeReadingTitle"><h3 id="scopeReadingTitle">Leitura do território</h3><div id="scopeReading" role="status"></div><details class="measure-help"><summary>O que este resumo considera?</summary><p>O ranking territorial usa todos os registros com votação no recorte. Filtros de nome, partido e resultado alteram a lista, mantendo o resumo do território completo. Liderança por votos não determina eleição.</p></details></section><div class="scope-line"><p id="scopeNote">Goiás · votação estadual</p><button id="shareFilters"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5a3 3 0 1 0 6 0 3 3 0 0 0-6 0M3 12a3 3 0 1 0 6 0 3 3 0 0 0-6 0m12 7a3 3 0 1 0 6 0 3 3 0 0 0-6 0M9 11l6-5m-6 7 6 5"/></svg> Compartilhar consulta</button></div><p id="shareStatus" class="chart-note" role="status"></p><label id="shareFallback" hidden>Link da consulta<input id="shareLink" readonly></label>
-<div class="comparison-hint"><p id="compareHint" aria-live="polite"></p><a href="#compare" id="compareJump" hidden>Comparar selecionados <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></a></div>
-<div class="table-wrap" tabindex="0" role="region" aria-label="Tabela de candidaturas"><table><caption class="sr-only">Candidaturas no recorte selecionado, ordenadas por votos nominais.</caption><thead><tr><th scope="col">Comparar</th><th scope="col">Ordem</th><th scope="col">Candidatura</th><th scope="col">Situação</th><th scope="col">Votos</th><th scope="col">% nominal</th><th scope="col">Perfil</th></tr></thead><tbody id="tbody"></tbody></table><p id="noResults" class="empty" hidden>Nenhum resultado. Ajuste a busca ou limpe os filtros.</p></div>
-<div id="candidateCards" class="candidate-cards" aria-label="Candidaturas"></div><p id="mobileEmpty" class="empty" hidden>Nenhum resultado. Ajuste a busca ou limpe os filtros.</p>
-<div class="pagination"><button id="prev">Anterior</button><span id="pageInfo" role="status"></span><button id="next">Próxima</button></div>
-<details class="measure-help"><summary>Como ler votos e percentuais?</summary><p>O percentual considera os votos nominais computados no estado, região ou município selecionado, sem votos de legenda. A ordem por votos não determina a eleição. Ausência de registro é diferente de zero votos.</p></details>
-</section>
-<section class="comparison-section" id="compare" hidden><div class="section-head"><div><h2>Compare lado a lado</h2><p>Votos no recorte e distribuição territorial de até três candidaturas.</p></div></div><div class="compare-grid" id="compareCards"></div></section>
-<section class="analysis-section" id="analise"><div class="section-head"><div><h2>O resultado em perspectiva</h2><p id="analysisScope">Composição estadual e votos nominais.</p></div></div><div class="analysis-layout"><section class="analysis-chart"><div class="chart-controls" role="group" aria-label="Tipo de gráfico"><button data-chart="seats" aria-pressed="true">Cadeiras eleitas</button><button data-chart="nominal" aria-pressed="false">Votos por partido</button></div><div class="legend"><span><i class="dot"></i>Eleitos</span><span><i class="dot blue"></i>Suplentes + não eleitos</span></div><div id="parties" class="bars"></div><p id="partyChartNote" class="chart-note"></p></section><section><h3 id="rankingTitle">Maiores votações estaduais</h3><ol class="rank-list" id="ranking"></ol><p id="voteSummary" class="chart-note"></p></section></div><div id="insights" class="insights-grid"></div><section class="regional-overview"><h3>Goiás por região</h3><p class="chart-note">Seis regiões intermediárias do IBGE. Toque em uma região para consultar sua votação. A liderança abaixo considera votos nominais, independentemente do resultado estadual.</p><div id="regionOverview"></div></section></section>
-</div>
-<section class="app-section" id="aplicativo"><div class="section-head"><div><h2>Consulta sempre à mão</h2><p>Adicione o observatório à tela inicial e consulte a base offline.</p></div></div><section class="pwa-panel"><div class="pwa-heading"><span class="brand-mark">GO</span><div><h3>Leve a consulta com você</h3><p>Funciona offline também no navegador.</p></div></div><p id="pwaStatus" role="status">Verificando acesso offline…</p><div class="file-buttons"><button id="installPwa">Adicionar à tela inicial</button><button id="updatePwa" class="primary" hidden>Aplicar atualização</button><button id="installHelp">A instalação não funcionou?</button></div><details><summary>Verificar conexão e arquivos</summary><button id="checkPwaUpdate">Verificar atualizações</button><button id="repairPwa">Verificar arquivos offline</button><p id="pwaDetails" class="chart-note"></p></details><p class="chart-note">A primeira preparação precisa de internet. Fontes externas exigem conexão. Dados salvos não atualizam a apuração automaticamente.</p></section></section>
-<section class="info-section" id="fontes"><div class="section-head"><div><h2>Fonte aberta. Contexto claro.</h2><p>Visualização independente, sem vínculo com a Justiça Eleitoral.</p></div><a href="https://dadosabertos.tse.jus.br/dataset/resultados-2026" target="_blank" rel="noopener">Consultar TSE <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></a></div><p id="dataPeriods" class="chart-note"></p><p id="dataCoverage"></p><div class="info-grid"><details><summary>Eleitos, suplentes e registros sem resultado</summary><p>Eleitos ocupam as vagas definidas na totalização. Suplentes não são classificados como eleitos. Registros sem resultado ficam separados; a quantidade de registros cadastrais pode diferir de candidaturas aptas.</p></details><details><summary>Bens e redes declarados</summary><p>Patrimônio declarado não é salário, renda anual ou auditoria independente. Sem registro não significa patrimônio zero. Endereços completos viram links; handles incompletos são exibidos como texto.</p></details><details><summary>Localização e regiões</summary><p>Municípios eleitorais do TSE foram associados aos municípios do IBGE por nomes únicos, com correspondências documentadas. Usamos regiões geográficas imediatas e intermediárias, que são divisões diferentes de regiões de planejamento do estado. O cadastro consultado informa UF de nascimento; não contém município de residência. A cidade de maior votação não é apresentada como domicílio.</p><p id="territorySource" class="chart-note"></p><a href="https://servicodados.ibge.gov.br/api/docs/localidades" target="_blank" rel="noopener">IBGE · Localidades e divisão territorial</a></details><details><summary>Como a base é calculada</summary><p>Cadastro e votação nominal por município e zona são cruzados por identificador de candidatura, filtrando Goiás, deputado estadual e primeiro turno. A soma municipal se reconcilia com a votação estadual. Datas e hashes da origem acompanham o projeto.</p></details><details><summary>Fontes e licença</summary><p><a href="https://dadosabertos.tse.jus.br/dataset/candidatos-2026" target="_blank" rel="noopener">TSE · Cadastro, bens e redes</a><br><a href="https://dadosabertos.tse.jus.br/dataset/resultados-2026" target="_blank" rel="noopener">TSE · Votação</a><br>Dados sob Creative Commons Atribuição. Base estática; retificações posteriores podem alterar resultados.</p></details></div></section>
-</main>
-<dialog id="profile" aria-labelledby="profileName"><div class="dialog-head"><div><h2 id="profileName"></h2><p id="profileSubtitle"></p></div><button id="closeProfile" aria-label="Fechar perfil"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 6 12 12M6 18 18 6"/></svg></button></div><div id="profileSummary" class="profile-summary"></div><section class="profile-territory" aria-labelledby="profileTerritoryTitle"><h3 id="profileTerritoryTitle">Onde recebeu votos</h3><ul id="profileReading" class="objective-reading"></ul><div id="profileTerritoryFacts" class="territory-facts"></div><p class="chart-note">Presença eleitoral indica onde os votos foram registrados. Não informa residência, endereço ou local de atuação profissional.</p></section><div class="profile-tools"><button id="favoriteProfile" aria-pressed="false">Salvar favorito</button><button id="printProfile">Imprimir / salvar PDF</button></div><details open><summary>Identificação e resultado</summary><dl class="profile-grid" id="profileFields"></dl></details><details><summary>Bens declarados <span id="profileAssetShort"></span></summary><section id="profileAssets"></section></details><details><summary>Redes declaradas</summary><section id="profileNetworks"></section></details><details open><summary>Votação nas regiões intermediárias</summary><div id="profileRegions"></div><p class="chart-note">Percentual do total estadual de votos desta candidatura. Regiões sem votos registrados aparecem com zero; base ausente permanece não informada.</p></details><details open><summary>Votação por município</summary><label>Buscar município<input id="profileCitySearch" type="search" placeholder="Digite o nome da cidade"></label><p id="profileCitiesCount" class="chart-note"></p><div id="profileCities"></div><button id="profileCitiesMore" hidden>Mostrar mais municípios</button></details><p class="chart-note">Perfil estadual. Votos municipais consideram todas as zonas. Confira a data da base antes de usar estes dados.</p><a href="https://divulgacandcontas.tse.jus.br/divulga/" target="_blank" rel="noopener">Consultar cadastro e contas no TSE <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></a></dialog>
-<dialog id="installGuide" aria-labelledby="installGuideTitle"><div class="dialog-head"><h2 id="installGuideTitle">Adicionar à tela inicial</h2><button id="closeInstallGuide" aria-label="Fechar ajuda de instalação"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 6 12 12M6 18 18 6"/></svg></button></div><p>Você pode continuar consultando dados pelo navegador, mesmo se a instalação falhar.</p><h3>Android · Chrome</h3><ol><li>Abra este site no Chrome e aguarde a consulta offline ficar pronta.</li><li>Use o botão de instalação quando disponível ou o menu do Chrome → Adicionar à tela inicial.</li><li>Se o menu mostrar “Abrir aplicativo” e aparecer “Não foi possível abrir o aplicativo”, o Chrome já reconhece uma instalação. Abra Configurações do Android → Aplicativos, localize somente Goiás 2026 e remova a instalação anterior. Depois retorne ao site para instalar novamente. Seus favoritos são armazenados neste navegador.</li></ol><h3>iPhone · Safari</h3><p>Compartilhar → Adicionar à Tela de Início.</p><a href="https://pabloguilherme1121.github.io/eleicoes-goias-2026/" target="_blank" rel="noopener" class="button-link">Continuar pelo navegador <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></a><p class="chart-note">O site não controla a abertura do aplicativo pelo Android. Atualização do Chrome e disponibilidade de espaço podem influenciar a instalação.</p></dialog>
-<footer><span>Observatório Eleitoral · Goiás 2026</span><a href="https://github.com/pabloguilherme1121/eleicoes-goias-2026">Código e metodologia</a></footer>
-<nav class="mobile-nav" aria-label="Navegação no celular"><a href="#inicio"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 10 12 3l9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z"/></svg><span>Início</span></a><a href="#consulta"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 21l-5-5M18 10a8 8 0 1 1-16 0 8 8 0 0 1 16 0"/></svg><span>Consulta</span></a><a href="#analise"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20V10m8 10V4m8 16v-7M2 21h20"/></svg><span>Análise</span></a><a href="#aplicativo"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 2h8a2 2 0 0 1 2 2v16a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2zM10 18h4"/></svg><span>Aplicativo</span></a><a href="#fontes"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 11v6m0-10v1M22 12a10 10 0 1 1-20 0 10 10 0 0 1 20 0"/></svg><span>Fontes</span></a></nav>
-</body></html>
+<html lang="pt-BR" data-release="49fc8e47ed07a68d">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <meta
+      name="description"
+      content="Consulte os votos, perfis e municípios das candidaturas a deputado estadual de Goiás em 2026. Dados do TSE, favoritos, comparação e consulta offline."
+    />
+    <meta name="theme-color" content="#0b1420" />
+    <link rel="manifest" href="manifest.webmanifest" />
+    <link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="Goiás 2026" />
+    <link rel="icon" type="image/png" href="icons/icon-192.png" />
+    <meta property="og:title" content="Goiás 2026 · Observatório Eleitoral" />
+    <meta
+      property="og:description"
+      content="Consulte candidaturas, votos e distribuição territorial em Goiás. Base TSE de 13/10/2026."
+    />
+    <meta property="og:type" content="website" />
+    <title>Goiás 2026 · Observatório Eleitoral</title>
+    <link rel="stylesheet" href="styles.css" />
+    <script src="model.js" defer></script>
+    <script src="app.js" defer></script>
+    <script src="pwa.js" defer></script>
+  </head>
+  <body>
+    <a class="skip" href="#consulta">Ir para a consulta</a>
+    <header class="site-header">
+      <a class="brand" href="#inicio"
+        ><span class="brand-mark">GO</span
+        ><span>Observatório Eleitoral<small>Goiás · 2026</small></span></a
+      >
+      <nav aria-label="Menu principal">
+        <a href="#consulta">Consulta</a><a href="#analise">Análise</a
+        ><a href="#aplicativo">Aplicativo</a><a href="#fontes">Fontes</a>
+      </nav>
+      <a class="header-action" href="#aplicativo"
+        >Instalar app
+        <svg
+          class="icon"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.7"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <path
+            d="M8 2h8a2 2 0 0 1 2 2v16a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2zM10 18h4"
+          /></svg
+      ></a>
+    </header>
+    <main>
+      <section class="intro" id="inicio">
+        <div>
+          <h1>
+            Goiás 2026.<br class="desktop-break" />
+            O voto em perspectiva.
+          </h1>
+          <p>
+            Consulte as candidaturas a deputado estadual, do resultado em Goiás
+            ao voto na sua cidade.
+          </p>
+        </div>
+        <a class="source-stamp" id="dataStamp" href="#fontes"
+          >Fonte TSE · carregando base</a
+        >
+      </section>
+      <div id="loading" role="status" class="loading">
+        <span class="loading-dot"></span>Carregando dados do TSE…
+      </div>
+      <noscript
+        ><p>
+          Ative JavaScript para consultar. A
+          <a href="data/candidatos.json">base JSON</a> também está disponível.
+        </p></noscript
+      >
+      <div id="content" hidden>
+        <section class="metrics" aria-label="Resumo estadual">
+          <article>
+            <strong id="totalCandidates">—</strong><span>registros</span>
+          </article>
+          <article>
+            <strong id="totalElected">—</strong><span>eleitos</span>
+          </article>
+          <article>
+            <strong id="totalNonElected">—</strong
+            ><span>suplentes e não eleitos</span
+            ><small id="nonElectedNote"></small>
+          </article>
+          <article>
+            <strong id="totalUnknown">—</strong><span>sem resultado</span>
+          </article>
+        </section>
+        <section
+          class="workspace"
+          id="consulta"
+          aria-labelledby="consulta-title"
+        >
+          <div class="section-head">
+            <div>
+              <h2 id="consulta-title">Encontre uma candidatura</h2>
+              <p>Explore perfis, resultados e presença nos municípios.</p>
+            </div>
+            <details class="preferences">
+              <summary>
+                Preferências
+                <svg
+                  class="icon"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.7"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  aria-hidden="true"
+                >
+                  <path d="M4 6h16M4 12h16M4 18h16M8 3v6m8 0v6m-8 0v6" />
+                </svg>
+              </summary>
+              <div>
+                <label
+                  >Leitura<select id="readingMode">
+                    <option value="summary">Direta</option>
+                    <option value="explained">Com explicações</option>
+                  </select></label
+                ><button id="themeToggle" aria-pressed="false">
+                  Tema claro</button
+                ><button id="contrastToggle" aria-pressed="false">
+                  Mais contraste
+                </button>
+              </div>
+            </details>
+          </div>
+          <aside class="explanation explained-only" hidden>
+            Escolha um recorte, abra um perfil e confira fonte e data. A
+            situação eleitoral é estadual; votos e percentuais mudam quando você
+            seleciona uma cidade.
+          </aside>
+          <div class="search-block">
+            <label class="sr-only" for="search">Nome ou número de urna</label
+            ><span
+              ><svg
+                class="icon"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.7"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <path
+                  d="M21 21l-5-5M18 10a8 8 0 1 1-16 0 8 8 0 0 1 16 0"
+                /></svg></span
+            ><input
+              type="search"
+              id="search"
+              placeholder="Busque por nome, número ou partido"
+              autocomplete="off"
+            />
+          </div>
+          <details id="territoryPanel" class="territory-panel">
+            <summary>
+              <span>Região ou município</span
+              ><strong id="territorySelection">Goiás</strong>
+            </summary>
+            <div class="territory-controls" aria-label="Recorte territorial">
+              <label
+                >Região do IBGE<select id="regionFilter">
+                  <option value="">Todo o estado</option>
+                </select></label
+              ><label
+                >Município<select
+                  id="municipalityFilter"
+                  aria-label="Município"
+                >
+                  <option value="">Todos os municípios</option>
+                </select></label
+              >
+            </div>
+            <details class="city-search">
+              <summary>Encontrar município pelo nome</summary>
+              <label class="sr-only" for="municipalitySearch"
+                >Buscar cidade para filtrar</label
+              ><input
+                id="municipalitySearch"
+                type="search"
+                placeholder="Digite o nome do município"
+              />
+            </details>
+          </details>
+          <div class="query-toolbar">
+            <div class="tabs" role="group" aria-label="Recorte do resultado">
+              <button data-view="all" aria-pressed="true">Todos</button
+              ><button data-view="elected" aria-pressed="false">Eleitos</button
+              ><button data-view="non" aria-pressed="false">
+                Não eleitos e suplentes
+              </button>
+            </div>
+            <details class="filter-panel">
+              <summary>
+                <svg
+                  class="icon"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.7"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  aria-hidden="true"
+                >
+                  <path d="M4 6h16M4 12h16M4 18h16M8 3v6m8 0v6m-8 0v6" />
+                </svg>
+                Filtros <span id="filterCount">0</span>
+              </summary>
+              <div class="filters">
+                <label
+                  >Partido<select id="partyFilter">
+                    <option value="">Todos os partidos</option>
+                  </select></label
+                ><label
+                  >Situação eleitoral<select id="statusFilter">
+                    <option value="">Todas as situações</option>
+                    <option>Eleito por quociente partidário</option>
+                    <option>Eleito por média</option>
+                    <option>Suplente</option>
+                    <option>Não eleito</option>
+                    <option>Sem resultado informado</option>
+                  </select></label
+                ><label
+                  >Ordenação<select id="sort">
+                    <option value="votes">Mais votos</option>
+                    <option value="low">Menos votos</option>
+                    <option value="name">Nome (A–Z)</option>
+                  </select></label
+                ><label class="check-label"
+                  ><input id="withVotesOnly" type="checkbox" /> Somente com
+                  votos no recorte</label
+                ><button id="clear">Limpar filtros</button>
+              </div>
+            </details>
+          </div>
+          <div
+            id="activeFilters"
+            class="active-filters"
+            aria-label="Filtros ativos"
+          ></div>
+          <div class="result-tools">
+            <p id="resultCount" role="status"></p>
+            <label class="check-label"
+              ><input id="favoritesOnly" type="checkbox" /> Meus favoritos
+              <span id="favoriteCount"></span
+            ></label>
+          </div>
+          <section class="scope-reading" aria-labelledby="scopeReadingTitle">
+            <h3 id="scopeReadingTitle">Leitura do território</h3>
+            <div id="scopeReading" role="status"></div>
+            <details class="measure-help">
+              <summary>O que este resumo considera?</summary>
+              <p>
+                O ranking territorial usa todos os registros com votação no
+                recorte. Filtros de nome, partido e resultado alteram a lista,
+                mantendo o resumo do território completo. Liderança por votos
+                não determina eleição.
+              </p>
+            </details>
+          </section>
+          <div class="scope-line">
+            <p id="scopeNote">Goiás · votação estadual</p>
+            <button id="shareFilters">
+              <svg
+                class="icon"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.7"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <path
+                  d="M15 5a3 3 0 1 0 6 0 3 3 0 0 0-6 0M3 12a3 3 0 1 0 6 0 3 3 0 0 0-6 0m12 7a3 3 0 1 0 6 0 3 3 0 0 0-6 0M9 11l6-5m-6 7 6 5"
+                />
+              </svg>
+              Compartilhar consulta
+            </button>
+          </div>
+          <p id="shareStatus" class="chart-note" role="status"></p>
+          <label id="shareFallback" hidden
+            >Link da consulta<input id="shareLink" readonly
+          /></label>
+          <div class="comparison-hint">
+            <p id="compareHint" aria-live="polite"></p>
+            <a href="#compare" id="compareJump" hidden
+              >Comparar selecionados
+              <svg
+                class="icon"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.7"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M5 12h14m-6-6 6 6-6 6" /></svg
+            ></a>
+          </div>
+          <div
+            class="table-wrap"
+            tabindex="0"
+            role="region"
+            aria-label="Tabela de candidaturas"
+          >
+            <table>
+              <caption class="sr-only">
+                Candidaturas no recorte selecionado, ordenadas por votos
+                nominais.
+              </caption>
+              <thead>
+                <tr>
+                  <th scope="col">Comparar</th>
+                  <th scope="col">Ordem</th>
+                  <th scope="col">Candidatura</th>
+                  <th scope="col">Situação</th>
+                  <th scope="col">Votos</th>
+                  <th scope="col">% nominal</th>
+                  <th scope="col">Perfil</th>
+                </tr>
+              </thead>
+              <tbody id="tbody"></tbody>
+            </table>
+            <div id="noResults" class="empty" hidden>
+              <h3>Nenhuma candidatura encontrada</h3>
+              <p>Tente outro nome ou remova um filtro.</p>
+              <button data-reset>Limpar filtros</button>
+            </div>
+          </div>
+          <div
+            id="candidateCards"
+            class="candidate-cards"
+            aria-label="Candidaturas"
+          ></div>
+          <div id="mobileEmpty" class="empty" hidden>
+            <h3>Nenhuma candidatura encontrada</h3>
+            <p>Tente outro nome ou remova um filtro.</p>
+            <button data-reset>Limpar filtros</button>
+          </div>
+          <div class="pagination">
+            <button id="prev">Anterior</button
+            ><span id="pageInfo" role="status"></span
+            ><button id="next">Próxima</button>
+          </div>
+          <details class="measure-help">
+            <summary>Como ler votos e percentuais?</summary>
+            <p>
+              O percentual considera os votos nominais computados no estado,
+              região ou município selecionado, sem votos de legenda. A ordem por
+              votos não determina a eleição. Ausência de registro é diferente de
+              zero votos.
+            </p>
+          </details>
+        </section>
+        <section class="comparison-section" id="compare" hidden>
+          <div class="section-head">
+            <div>
+              <h2>Compare lado a lado</h2>
+              <p>
+                Votos no recorte e distribuição territorial de até três
+                candidaturas.
+              </p>
+            </div>
+          </div>
+          <button id="clearComparison">Limpar comparação</button>
+          <div class="compare-grid" id="compareCards"></div>
+        </section>
+        <section class="analysis-section" id="analise">
+          <div class="section-head">
+            <div>
+              <h2>O resultado em perspectiva</h2>
+              <p id="analysisScope">Composição estadual e votos nominais.</p>
+            </div>
+          </div>
+          <div class="analysis-layout">
+            <section class="analysis-chart">
+              <div
+                class="chart-controls"
+                role="group"
+                aria-label="Tipo de gráfico"
+              >
+                <button data-chart="seats" aria-pressed="true">
+                  Cadeiras eleitas</button
+                ><button data-chart="nominal" aria-pressed="false">
+                  Votos por partido
+                </button>
+              </div>
+              <div class="legend">
+                <span><i class="dot"></i>Eleitos</span
+                ><span><i class="dot blue"></i>Suplentes + não eleitos</span>
+              </div>
+              <div id="parties" class="bars"></div>
+              <p id="partyChartNote" class="chart-note"></p>
+            </section>
+            <section>
+              <h3 id="rankingTitle">Maiores votações estaduais</h3>
+              <ol class="rank-list" id="ranking"></ol>
+              <p id="voteSummary" class="chart-note"></p>
+            </section>
+          </div>
+          <div id="insights" class="insights-grid"></div>
+          <section class="regional-overview">
+            <h3>Goiás por região</h3>
+            <p class="chart-note">
+              Seis regiões intermediárias do IBGE. Toque em uma região para
+              consultar sua votação. A liderança abaixo considera votos
+              nominais, independentemente do resultado estadual.
+            </p>
+            <div id="regionOverview"></div>
+          </section>
+        </section>
+      </div>
+      <section class="app-section" id="aplicativo">
+        <div class="section-head">
+          <div>
+            <h2>Consulta sempre à mão</h2>
+            <p>
+              Adicione o observatório à tela inicial e consulte a base offline.
+            </p>
+          </div>
+        </div>
+        <section class="pwa-panel">
+          <div class="pwa-heading">
+            <span class="brand-mark">GO</span>
+            <div>
+              <h3>Leve a consulta com você</h3>
+              <p>Funciona offline também no navegador.</p>
+            </div>
+          </div>
+          <p id="pwaStatus" role="status">Verificando acesso offline…</p>
+          <div class="file-buttons">
+            <button id="installPwa">Adicionar à tela inicial</button
+            ><button id="updatePwa" class="primary" hidden>
+              Aplicar atualização</button
+            ><button id="installHelp">A instalação não funcionou?</button>
+          </div>
+          <details>
+            <summary>Verificar conexão e arquivos</summary>
+            <button id="checkPwaUpdate">Verificar atualizações</button
+            ><button id="repairPwa">Verificar arquivos offline</button>
+            <p id="pwaDetails" class="chart-note"></p>
+          </details>
+          <p class="chart-note">
+            A primeira preparação precisa de internet. Fontes externas exigem
+            conexão. Dados salvos não atualizam a apuração automaticamente.
+          </p>
+        </section>
+      </section>
+      <section class="info-section" id="fontes">
+        <div class="section-head">
+          <div>
+            <h2>Fonte aberta. Contexto claro.</h2>
+            <p>
+              Visualização independente, sem vínculo com a Justiça Eleitoral.
+            </p>
+          </div>
+          <a
+            href="https://dadosabertos.tse.jus.br/dataset/resultados-2026"
+            target="_blank"
+            rel="noopener"
+            >Consultar TSE
+            <svg
+              class="icon"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.7"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+            >
+              <path d="M5 12h14m-6-6 6 6-6 6" /></svg
+          ></a>
+        </div>
+        <p id="dataPeriods" class="chart-note"></p>
+        <p id="dataCoverage"></p>
+        <div class="info-grid">
+          <details>
+            <summary>Eleitos, suplentes e registros sem resultado</summary>
+            <p>
+              Eleitos ocupam as vagas definidas na totalização. Suplentes não
+              são classificados como eleitos. Registros sem resultado ficam
+              separados; a quantidade de registros cadastrais pode diferir de
+              candidaturas aptas.
+            </p>
+          </details>
+          <details>
+            <summary>Bens e redes declarados</summary>
+            <p>
+              Patrimônio declarado não é salário, renda anual ou auditoria
+              independente. Sem registro não significa patrimônio zero.
+              Endereços completos viram links; handles incompletos são exibidos
+              como texto.
+            </p>
+          </details>
+          <details>
+            <summary>Localização e regiões</summary>
+            <p>
+              Municípios eleitorais do TSE foram associados aos municípios do
+              IBGE por nomes únicos, com correspondências documentadas. Usamos
+              regiões geográficas imediatas e intermediárias, que são divisões
+              diferentes de regiões de planejamento do estado. O cadastro
+              consultado informa UF de nascimento; não contém município de
+              residência. A cidade de maior votação não é apresentada como
+              domicílio.
+            </p>
+            <p id="territorySource" class="chart-note"></p>
+            <a
+              href="https://servicodados.ibge.gov.br/api/docs/localidades"
+              target="_blank"
+              rel="noopener"
+              >IBGE · Localidades e divisão territorial</a
+            >
+          </details>
+          <details>
+            <summary>Como a base é calculada</summary>
+            <p>
+              Cadastro e votação nominal por município e zona são cruzados por
+              identificador de candidatura, filtrando Goiás, deputado estadual e
+              primeiro turno. A soma municipal se reconcilia com a votação
+              estadual. Datas e hashes da origem acompanham o projeto.
+            </p>
+          </details>
+          <details>
+            <summary>Fontes e licença</summary>
+            <p>
+              <a
+                href="https://dadosabertos.tse.jus.br/dataset/candidatos-2026"
+                target="_blank"
+                rel="noopener"
+                >TSE · Cadastro, bens e redes</a
+              ><br /><a
+                href="https://dadosabertos.tse.jus.br/dataset/resultados-2026"
+                target="_blank"
+                rel="noopener"
+                >TSE · Votação</a
+              ><br />Dados sob Creative Commons Atribuição. Base estática;
+              retificações posteriores podem alterar resultados.
+            </p>
+          </details>
+        </div>
+      </section>
+    </main>
+    <dialog id="profile" aria-labelledby="profileName">
+      <div class="dialog-head">
+        <div>
+          <h2 id="profileName"></h2>
+          <p id="profileSubtitle"></p>
+        </div>
+        <button id="closeProfile" aria-label="Fechar perfil">
+          <svg
+            class="icon"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.7"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <path d="m6 6 12 12M6 18 18 6" />
+          </svg>
+        </button>
+      </div>
+      <div id="profileSummary" class="profile-summary"></div>
+      <section
+        class="profile-territory"
+        aria-labelledby="profileTerritoryTitle"
+      >
+        <h3 id="profileTerritoryTitle">Onde recebeu votos</h3>
+        <ul id="profileReading" class="objective-reading"></ul>
+        <div id="profileTerritoryFacts" class="territory-facts"></div>
+        <p class="chart-note">
+          Presença eleitoral indica onde os votos foram registrados. Não informa
+          residência, endereço ou local de atuação profissional.
+        </p>
+      </section>
+      <div class="profile-navigation">
+        <button id="previousProfile">Perfil anterior</button
+        ><span id="profilePosition" role="status"></span
+        ><button id="nextProfile">Próximo perfil</button>
+      </div>
+      <div class="profile-tools">
+        <button id="favoriteProfile" aria-pressed="false">
+          Salvar favorito</button
+        ><button id="shareProfile">Compartilhar perfil</button
+        ><button id="printProfile">Imprimir / salvar PDF</button>
+      </div>
+      <p id="profileShareStatus" class="chart-note" role="status"></p>
+      <label id="profileShareFallback" hidden
+        >Link do perfil<input id="profileShareLink" readonly
+      /></label>
+      <details open>
+        <summary>Identificação e resultado</summary>
+        <dl class="profile-grid" id="profileFields"></dl>
+      </details>
+      <details>
+        <summary>Bens declarados <span id="profileAssetShort"></span></summary>
+        <section id="profileAssets"></section>
+      </details>
+      <details>
+        <summary>Redes declaradas</summary>
+        <section id="profileNetworks"></section>
+      </details>
+      <details open>
+        <summary>Votação nas regiões intermediárias</summary>
+        <div id="profileRegions"></div>
+        <p class="chart-note">
+          Percentual do total estadual de votos desta candidatura. Regiões sem
+          votos registrados aparecem com zero; base ausente permanece não
+          informada.
+        </p>
+      </details>
+      <details open>
+        <summary>Votação por município</summary>
+        <label
+          >Buscar município<input
+            id="profileCitySearch"
+            type="search"
+            placeholder="Digite o nome da cidade"
+        /></label>
+        <p id="profileCitiesCount" class="chart-note"></p>
+        <div id="profileCities"></div>
+        <button id="profileCitiesMore" hidden>Mostrar mais municípios</button>
+      </details>
+      <p class="chart-note">
+        Perfil estadual. Votos municipais consideram todas as zonas. Confira a
+        data da base antes de usar estes dados.
+      </p>
+      <a
+        href="https://divulgacandcontas.tse.jus.br/divulga/"
+        target="_blank"
+        rel="noopener"
+        >Consultar cadastro e contas no TSE
+        <svg
+          class="icon"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.7"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <path d="M5 12h14m-6-6 6 6-6 6" /></svg
+      ></a>
+    </dialog>
+    <dialog id="installGuide" aria-labelledby="installGuideTitle">
+      <div class="dialog-head">
+        <h2 id="installGuideTitle">Adicionar à tela inicial</h2>
+        <button id="closeInstallGuide" aria-label="Fechar ajuda de instalação">
+          <svg
+            class="icon"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.7"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <path d="m6 6 12 12M6 18 18 6" />
+          </svg>
+        </button>
+      </div>
+      <p>
+        Você pode continuar consultando dados pelo navegador, mesmo se a
+        instalação falhar.
+      </p>
+      <h3>Android · Chrome</h3>
+      <ol>
+        <li>
+          Abra este site no Chrome e aguarde a consulta offline ficar pronta.
+        </li>
+        <li>
+          Use o botão de instalação quando disponível ou o menu do Chrome →
+          Adicionar à tela inicial.
+        </li>
+        <li>
+          Se o menu mostrar “Abrir aplicativo” e aparecer “Não foi possível
+          abrir o aplicativo”, o Chrome já reconhece uma instalação. Abra
+          Configurações do Android → Aplicativos, localize somente Goiás 2026 e
+          remova a instalação anterior. Depois retorne ao site para instalar
+          novamente. Seus favoritos são armazenados neste navegador.
+        </li>
+      </ol>
+      <h3>iPhone · Safari</h3>
+      <p>Compartilhar → Adicionar à Tela de Início.</p>
+      <a
+        href="https://pabloguilherme1121.github.io/eleicoes-goias-2026/"
+        target="_blank"
+        rel="noopener"
+        class="button-link"
+        >Continuar pelo navegador
+        <svg
+          class="icon"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.7"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <path d="M5 12h14m-6-6 6 6-6 6" /></svg
+      ></a>
+      <p class="chart-note">
+        O site não controla a abertura do aplicativo pelo Android. Atualização
+        do Chrome e disponibilidade de espaço podem influenciar a instalação.
+      </p>
+    </dialog>
+    <footer>
+      <span>Observatório Eleitoral · Goiás 2026</span
+      ><a href="https://github.com/pabloguilherme1121/eleicoes-goias-2026"
+        >Código e metodologia</a
+      >
+    </footer>
+    <aside
+      id="compareTray"
+      class="compare-tray"
+      aria-label="Comparação selecionada"
+      hidden
+    >
+      <span id="compareTrayCount" role="status"></span
+      ><a href="#compare">Comparar perfis</a
+      ><button id="clearCompareTray" aria-label="Limpar perfis selecionados">
+        Limpar
+      </button>
+    </aside>
+    <nav class="mobile-nav" aria-label="Navegação no celular">
+      <a href="#inicio"
+        ><svg
+          class="icon"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.7"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <path
+            d="M3 10 12 3l9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z"
+          /></svg
+        ><span>Início</span></a
+      ><a href="#consulta"
+        ><svg
+          class="icon"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.7"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <path d="M21 21l-5-5M18 10a8 8 0 1 1-16 0 8 8 0 0 1 16 0" /></svg
+        ><span>Consulta</span></a
+      ><a href="#analise"
+        ><svg
+          class="icon"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.7"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <path d="M4 20V10m8 10V4m8 16v-7M2 21h20" /></svg
+        ><span>Análise</span></a
+      ><a href="#aplicativo"
+        ><svg
+          class="icon"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.7"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <path
+            d="M8 2h8a2 2 0 0 1 2 2v16a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2zM10 18h4"
+          /></svg
+        ><span>Aplicativo</span></a
+      ><a href="#fontes"
+        ><svg
+          class="icon"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.7"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <path
+            d="M12 11v6m0-10v1M22 12a10 10 0 1 1-20 0 10 10 0 0 1 20 0"
+          /></svg
+        ><span>Fontes</span></a
+      >
+    </nav>
+  </body>
+</html>
