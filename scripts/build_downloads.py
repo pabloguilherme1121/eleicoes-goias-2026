@@ -17,7 +17,7 @@ html = html.replace('href="data/candidatos.json"', 'href="#baixar" data-json-dow
 payload = json.dumps(data,ensure_ascii=False,separators=(',',':')).replace('<','\\u003c')
 html = html.replace('</body>', '<script id="embeddedData" type="application/json">'+payload+'</script><script>'+js.replace('</script','<\\/script')+'</script></body>')
 portable = out/'painel-goias-2026-offline.html'
-portable.write_text(html,encoding='utf8')
+portable.write_text(html,encoding='utf8',newline='\n')
 with zipfile.ZipFile(out/'eleicoes-goias-2026.zip','w',compression=zipfile.ZIP_DEFLATED) as z:
     for name in ('index.html','app.js','styles.css','README.md','.gitattributes','.nojekyll','data/candidatos.json','data/proveniencia.json','scripts/import_tse.py','scripts/build_downloads.py','scripts/check_downloads.py'):
         z.write(root/name,'eleicoes-goias-2026/'+name)
