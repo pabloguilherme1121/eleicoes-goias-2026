@@ -12,7 +12,7 @@
   window.addEventListener('appinstalled',()=>{prompt=null;install.hidden=true;status.textContent='Aplicativo instalado. A consulta está disponível na tela inicial.';});
   const onlineStatus=()=>{status.textContent=ready?(navigator.onLine?'Consulta offline pronta neste aparelho.':'Sem conexão. Consultando os dados salvos neste aparelho.'):'O modo offline ainda não foi preparado. Conecte-se e recarregue para tentar novamente.';};
   window.addEventListener('online',()=>{onlineStatus();registration?.update().catch(()=>{});});window.addEventListener('offline',onlineStatus);
-  if(!('serviceWorker' in navigator)){status.textContent='Este navegador não oferece consulta offline como aplicativo. Baixe o HTML offline abaixo.';return;}
+  if(!('serviceWorker' in navigator)){status.textContent='Este navegador não oferece consulta offline como aplicativo. A consulta online continua disponível.';return;}
   function ask(worker,type){return new Promise((resolve,reject)=>{if(!worker){reject(new Error('Sem aplicativo ativo'));return;}const channel=new MessageChannel();const timer=setTimeout(()=>{channel.port1.close();reject(new Error('Verificação demorou demais'))},8000);channel.port1.onmessage=event=>{clearTimeout(timer);channel.port1.close();resolve(event.data)};worker.postMessage({type},[channel.port2]);})}
   const markReady=async(type='OFFLINE_STATUS')=>{try{const reg=registration||await navigator.serviceWorker.ready;const result=await ask(reg.active||navigator.serviceWorker.controller,type);ready=result.ok===true;onlineStatus();if(ready&&result.repairFailed)status.textContent='Consulta offline preservada. Não foi possível concluir o reparo; verifique a conexão ou atualize o aplicativo.';details.textContent=ready?`${result.files}/${result.expected} arquivos verificados · ${(result.bytes/1024/1024).toLocaleString('pt-BR',{maximumFractionDigits:2})} MB salvos neste aparelho`:'Arquivos offline incompletos. Conecte-se e use Verificar arquivos offline para reparar.';return result;}catch{ready=false;status.textContent='Não foi possível confirmar os arquivos offline. Conecte-se e tente verificar novamente.';}};
   navigator.serviceWorker.register('service-worker.js',{scope:'./',updateViaCache:'none'}).then(reg=>{
@@ -21,7 +21,7 @@
     if(reg.active)markReady();
     reg.addEventListener('updatefound',()=>{const worker=reg.installing;if(!worker)return;worker.addEventListener('statechange',()=>{if(worker.state==='installed'){if(navigator.serviceWorker.controller)update.hidden=false;else markReady();}if(worker.state==='redundant'&&!ready)status.textContent='Não foi possível preparar o modo offline. Conecte-se e recarregue para tentar novamente.';});});
     navigator.serviceWorker.ready.then(()=>markReady());
-  }).catch(()=>{status.textContent='Modo offline indisponível neste navegador. Você pode baixar o HTML offline.';});
+  }).catch(()=>{status.textContent='Modo offline indisponível neste navegador. Continue consultando pelo navegador.';});
   update.addEventListener('click',()=>{if(registration?.waiting){update.disabled=true;registration.waiting.postMessage({type:'ACTIVATE_UPDATE'});}});
   let controlled=Boolean(navigator.serviceWorker.controller);
   navigator.serviceWorker.addEventListener('controllerchange',()=>{if(controlled)location.reload();controlled=true;});

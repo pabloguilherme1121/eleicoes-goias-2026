@@ -8,7 +8,7 @@ template=re.sub(r"const CACHE = '[^']+';", "const CACHE = 'goias-eleitoral-__VER
 template=re.sub(r'const INTEGRITY = .*?;', 'const INTEGRITY = __INTEGRITY__;',template)
 digest=hashlib.sha256(template.encode())
 integrity={}
-for name in ['index.html','styles.css','model.js','files.js','app.js','pwa.js','manifest.webmanifest','data/candidatos.json']:
+for name in ['index.html','styles.css','model.js','app.js','pwa.js','manifest.webmanifest','data/candidatos.json']:
     data=(root/name).read_bytes()
     if name=='index.html':data=re.sub(rb'data-release="[^"]*"',b'data-release="__RELEASE__"',data)
     digest.update(data)
