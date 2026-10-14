@@ -11,6 +11,14 @@
     {
       "nome": "votacao_candidato_munzona_2026_GO.csv",
       "sha256": "2a7a3b5b76f2faeccacbb9bc87dafbed042c1541cf9345e58e0497652675f14f"
+    },
+    {
+      "nome": "bem_candidato_2026_GO.csv",
+      "sha256": "70522126fb508271991f7ce0ae10adc3afe80772a13f331af244ea22c6c3374f"
+    },
+    {
+      "nome": "rede_social_candidato_2026_GO.csv",
+      "sha256": "e7e3a99e55202b60e12ce1f38dc3a19be4ab0578d40a8b884acaaeed7193cdef"
     }
   ],
   "registros": 595,

@@ -9,7 +9,7 @@ Site: https://pabloguilherme1121.github.io/eleicoes-goias-2026/
 - 595 registros de candidatura: 41 eleitos, 429 suplentes, 92 não eleitos e 33 sem resultado informado.
 - Votação disponível para 556 registros; ausência de registro não é tratada como zero.
 - Busca por nome de urna, nome completo e número; filtros por partido e resultado; paginação.
-- Perfil: idade na eleição, ocupação, escolaridade, partido, federação, votos e cinco municípios com maior votação.
+- Perfil: idade na eleição, ocupação, escolaridade, partido, federação, votos e todos os municípios com votação registrada.
 - Comparação de até três perfis, ranking geral e exportação CSV do recorte inteiro, além da página visível.
 
 ## Origem e método
@@ -69,3 +69,24 @@ Android/Chrome e Edge: use o botão Instalar aplicativo quando o navegador o dis
 Atualizações: um novo cache é preparado integralmente antes de substituir o anterior. O botão Atualizar aplicativo ativa a versão nova e recarrega os clientes controlados. O cache é isolado sob /eleicoes-goias-2026/ e não modifica outros sites da conta. Versões antigas ficam ativas até a troca, para manter HTML, JavaScript e dados consistentes. O aplicativo é uma fotografia estática dos dados, não um sistema de apuração ao vivo.
 
 Execute `python scripts/build_downloads.py` após alterar interface, PWA ou dados: o comando também versiona o service worker pelo conteúdo. Para testar localmente, use localhost/127.0.0.1 com o servidor HTTP. HTML aberto como arquivo é a entrega offline independente; não instala service worker.
+
+
+## Consulta municipal e dados complementares
+
+A base agora contém 246 municípios. `votacaoMunicipal` usa pares `[índice do município, votos]`, referenciando o catálogo `municipios`. Apenas valores positivos são armazenados; candidatos com votação estadual registrada recebem zero em cidades sem votos. Candidaturas sem registro de votação permanecem “Não informado”. O perfil JSON converte os índices em nomes e códigos de município.
+
+O filtro municipal altera os votos, a posição e o denominador percentual da consulta; a situação eleitoral continua estadual. Perfis, comparação e indicadores de contexto mostram valores estaduais explicitamente. O CSV identifica o recorte e preserva também os votos estaduais. Os filtros geográficos, busca, ordenação e página ficam na URL para sobreviver a recarregamentos; favoritos permanecem pessoais no aparelho.
+
+Dados complementares do conjunto Candidatos 2026: bens declarados (total, quantidade e soma por tipo, sem descrições individuais) e redes/endereços declarados. Soma monetária calculada com Decimal no importador. Não há inferência de patrimônio zero quando faltam registros. Somente URLs HTTP/HTTPS completas sem credenciais viram links; handles são textos. Não se afirma que contas declaradas continuam ativas.
+
+A extração atual tem 422 candidaturas com registros de bens e 482 com redes/endereços declarados. Datas de cada CSV ficam em `meta.geracaoComplementar`; arquivos e hashes em `data/proveniencia.json`. Para importar os complementos, acrescente os CSVs de bens e redes:
+
+```powershell
+python scripts/import_tse.py cadastro_GO.csv votacao_GO.csv bem_candidato_2026_GO.csv rede_social_candidato_2026_GO.csv
+python scripts/build_downloads.py
+python scripts/check_data.py
+python scripts/check_downloads.py
+node scripts/test_pwa.cjs
+```
+
+O PWA confirma a presença de cada recurso antes de informar que está pronto. O botão Verificar arquivos offline primeiro confere o cache; só tenta repará-lo, com conexão, se estiver incompleto. Requests de instalação, reparo e fallback incluem integridade SHA-256 da versão gerada, para não misturar recursos de uma publicação posterior. Falhas de reparo preservam o cache já válido. Uma atualização deve ser aplicada pelo botão Atualizar aplicativo.
