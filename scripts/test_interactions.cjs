@@ -33,18 +33,20 @@ const tick = () => new Promise((resolve) => setTimeout(resolve, 50));
     d = w.document;
   await tick();
   assert.equal(d.getElementById("content").hidden, false);
+  assert.equal(d.getElementById("pageSize").value, "50");
+  assert.match(d.getElementById("noVotesNote").textContent, /39 sem votação registrada/);
   assert.equal(
     d.querySelectorAll("#candidateCards .candidate-card").length,
-    150,
+    50,
   );
   assert.equal(d.querySelectorAll("#ranking li").length, 150);
-  assert.match(d.getElementById("resultCount").textContent, /1–150 de 595/);
+  assert.match(d.getElementById("resultCount").textContent, /1–50 de 595/);
   d.getElementById("next").click();
   assert.equal(
     d.querySelectorAll("#candidateCards .candidate-card").length,
-    150,
+    50,
   );
-  assert.match(d.getElementById("resultCount").textContent, /151–300 de 595/);
+  assert.match(d.getElementById("resultCount").textContent, /51–100 de 595/);
   d.getElementById("prev").click();
   d.getElementById("pageSize").value = "50";
   d.getElementById("pageSize").dispatchEvent(new w.Event("change"));
@@ -68,6 +70,11 @@ const tick = () => new Promise((resolve) => setTimeout(resolve, 50));
   assert.equal(d.getElementById("mobileEmpty").hidden, false);
   d.querySelector('[data-clear-filter="minVotes"]').click();
   d.querySelector('[data-clear-filter="maxVotes"]').click();
+  const age = d.getElementById("ageFilter");
+  age.value = "60+";
+  age.dispatchEvent(new w.Event("change"));
+  assert.equal(d.getElementById("filterCount").textContent, "1 filtro ativo");
+  d.querySelector('[data-clear-filter="ageFilter"]').click();
 
   assert.equal(d.getElementById("profile").open, true);
   assert.equal(
@@ -75,6 +82,9 @@ const tick = () => new Promise((resolve) => setTimeout(resolve, 50));
     "90002554683",
   );
   assert.match(d.getElementById("profileName").textContent, /Carol/);
+  assert.equal(d.getElementById("profileLegalNotice").hidden, false);
+  assert.match(d.getElementById("profileLegalNotice").textContent, /PENDENTE DE JULGAMENTO/);
+  assert.match(d.getElementById("profileFields").textContent, /Situação do julgamento/);
   assert.equal(d.getElementById("previousProfile").disabled, true);
   const first = d.getElementById("profileName").textContent;
   d.getElementById("nextProfile").click();
@@ -204,7 +214,7 @@ const tick = () => new Promise((resolve) => setTimeout(resolve, 50));
   await tick();
   assert.equal(
     desktop.window.document.querySelectorAll("#tbody tr").length,
-    150,
+    50,
   );
   assert.equal(
     desktop.window.document.querySelectorAll("#candidateCards .candidate-card")
@@ -212,6 +222,11 @@ const tick = () => new Promise((resolve) => setTimeout(resolve, 50));
     0,
   );
   desktop.window.close();
+  const annulled = data.candidatos.find((c) => c.destinacao === "Anulado sub judice");
+  const legalProfile = setup(`https://example.test/?perfil=${annulled.id}`);
+  await tick();
+  assert.match(legalProfile.window.document.getElementById("profileLegalNotice").textContent, /Anulado sub judice/);
+  legalProfile.window.close();
 
   console.log(
     "PASS: links de perfil, navegação, histórico, filtros, limite de comparação, impressão completa e ausência de exportações.",
