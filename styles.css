@@ -1860,3 +1860,8 @@ body {
   .candidate-card .candidate-bio,
   .candidate-card .candidate-territory { font-size: 13px; line-height: 1.5; }
 }
+
+.project-network-links { display: flex; flex-wrap: wrap; gap: 8px 20px; margin-top: 12px; }
+.project-network-links a { display: inline-flex; align-items: center; min-height: 44px; text-underline-offset: 4px; }
+.project-network-links a:focus-visible { outline: 2px solid currentColor; outline-offset: 4px; }
+@media print { .project-network-links { display: none; } }
