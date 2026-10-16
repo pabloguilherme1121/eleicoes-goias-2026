@@ -38,17 +38,6 @@ const esc = (s) =>
         c
       ],
   );
-/** Only absolute HTTP(S) destinations supplied in the TSE source become clickable. */
-function safeDeclaredUrl(value) {
-  if (typeof value !== "string" || !/^https?:\/\//i.test(value.trim())) return null;
-  try {
-    const parsed = new URL(value.trim());
-    if (!["http:", "https:"].includes(parsed.protocol) || parsed.username || parsed.password) return null;
-    return parsed.href;
-  } catch {
-    return null;
-  }
-}
 const norm = (s) =>
   String(s)
     .normalize("NFD")
@@ -807,7 +796,7 @@ function renderProfileExtras() {
   $("profileAssets").innerHTML =
     `<h3>Bens declarados</h3><p class="asset-total">${money(c.bensDeclarados)}</p><p class="chart-note">${c.quantidadeBens == null ? "Sem bens registrados neste arquivo; não inferimos patrimônio zero." : fmt(c.quantidadeBens) + " itens declarados. Total declarado, não renda ou auditoria patrimonial."} Fonte: TSE · ${esc(meta.geracaoComplementar?.bens)}</p>${(c.tiposBens || []).map((b) => `<div class="city-row"><span>${esc(b.tipo)}</span><strong>${money(b.valor)}</strong></div>`).join("")}`;
   $("profileNetworks").innerHTML =
-    `<h3>Redes e endereços declarados</h3>${(c.redesDeclaradas || []).length ? "<ul>" + c.redesDeclaradas.map((r) => `<li>${safeDeclaredUrl(r.url) ? `<a href="${esc(safeDeclaredUrl(r.url))}" target="_blank" rel="noopener noreferrer nofollow">${esc(r.declarado)}</a>` : esc(r.declarado)}</li>`).join("") : '<p class="muted">Sem endereço declarado neste arquivo.</p>'}<p class="chart-note">Informações declaradas ao TSE em ${esc(meta.geracaoComplementar?.redes)}. Handles sem endereço completo são exibidos como texto. Não verificamos atividade das contas.</p>`;
+    `<h3>Redes e endereços declarados</h3>${(c.redesDeclaradas || []).length ? "<ul>" + c.redesDeclaradas.map((r) => `<li>${ElectionCore.safeDeclaredUrl(r.url) ? `<a href="${esc(ElectionCore.safeDeclaredUrl(r.url))}" target="_blank" rel="noopener noreferrer nofollow">${esc(r.declarado)}</a>` : esc(r.declarado)}</li>`).join("") : '<p class="muted">Sem endereço declarado neste arquivo.</p>'}<p class="chart-note">Informações declaradas ao TSE em ${esc(meta.geracaoComplementar?.redes)}. Handles sem endereço completo são exibidos como texto. Não verificamos atividade das contas.</p>`;
   renderProfileCities();
 }
 $("profileCitiesMore").addEventListener("click", () => {
