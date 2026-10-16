@@ -32,11 +32,11 @@ const tick = () => new Promise((resolve) => setTimeout(resolve, 50));
     w = dom.window,
     d = w.document;
   await tick();
-  assert.equal(w.safeDeclaredUrl("javascript:alert(1)"), null, "declared javascript links must not be clickable");
-  assert.equal(w.safeDeclaredUrl("data:text/html,<svg/onload=alert(1)>"), null);
-  assert.equal(w.safeDeclaredUrl("//example.com"), null);
-  assert.equal(w.safeDeclaredUrl("https://example.com/profile"), "https://example.com/profile");
-  assert.equal(w.safeDeclaredUrl("http://example.com/"), "http://example.com/");
+  assert.equal(w.ElectionCore.safeDeclaredUrl("javascript:alert(1)"), null, "declared javascript links must not be clickable");
+  assert.equal(w.ElectionCore.safeDeclaredUrl("data:text/html,<svg/onload=alert(1)>"), null);
+  assert.equal(w.ElectionCore.safeDeclaredUrl("//example.com"), null);
+  assert.equal(w.ElectionCore.safeDeclaredUrl("https://example.com/profile"), "https://example.com/profile");
+  assert.equal(w.ElectionCore.safeDeclaredUrl("http://example.com/"), "http://example.com/");
   assert.equal(d.getElementById("content").hidden, false);
   assert.equal(d.getElementById("pageSize").value, "all");
   assert.match(d.getElementById("noVotesNote").textContent, /39 sem votação registrada/);
