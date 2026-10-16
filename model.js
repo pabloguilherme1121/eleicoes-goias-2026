@@ -199,7 +199,18 @@
       territory,
     };
   }
-  const api = { createModel, normalize };
+/** Only absolute HTTP(S) destinations supplied in the TSE source become clickable. */
+function safeDeclaredUrl(value) {
+  if (typeof value !== "string" || !/^https?:\/\//i.test(value.trim())) return null;
+  try {
+    const parsed = new URL(value.trim());
+    if (!["http:", "https:"].includes(parsed.protocol) || parsed.username || parsed.password) return null;
+    return parsed.href;
+  } catch {
+    return null;
+  }
+}
+  const api = { createModel, normalize, safeDeclaredUrl };
   globalThis.ElectionCore = api;
   if (typeof module === "object") module.exports = api;
 })();
