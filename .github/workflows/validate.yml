@@ -18,6 +18,8 @@ jobs:
         with:
           python-version: '3.12'
       - run: npm ci --ignore-scripts
+      - name: Generate local PWA files before integrity tests (temporary PR verification)
+        run: python scripts/build_pwa.py
       - run: npm test
       - run: python scripts/check_data.py
       - run: python scripts/test_ranking.py
