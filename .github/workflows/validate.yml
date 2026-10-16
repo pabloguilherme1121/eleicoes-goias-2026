@@ -24,4 +24,10 @@ jobs:
       - name: Verify generated PWA version
         run: |
           python scripts/build_pwa.py
+          python - <<'PY'
+          import base64
+          from pathlib import Path
+          for name in ('index.html','service-worker.js','consulta.html','versao.json'):
+              print('PWA_GENERATED:'+name+':'+base64.b64encode(Path(name).read_bytes()).decode())
+          PY
           git diff --exit-code -- index.html service-worker.js consulta.html versao.json
