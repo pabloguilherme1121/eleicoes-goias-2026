@@ -18,18 +18,10 @@ jobs:
         with:
           python-version: '3.12'
       - run: npm ci --ignore-scripts
-      - name: Generate local PWA files before integrity tests (temporary PR verification)
-        run: python scripts/build_pwa.py
       - run: npm test
       - run: python scripts/check_data.py
       - run: python scripts/test_ranking.py
       - name: Verify generated PWA version
         run: |
           python scripts/build_pwa.py
-          python - <<'PY'
-          import base64
-          from pathlib import Path
-          for name in ('index.html','service-worker.js','consulta.html','versao.json'):
-              print('PWA_GENERATED:'+name+':'+base64.b64encode(Path(name).read_bytes()).decode())
-          PY
           git diff --exit-code -- index.html service-worker.js consulta.html versao.json
