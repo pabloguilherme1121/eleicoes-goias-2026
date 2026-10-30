@@ -18,6 +18,7 @@ assert [c['ranking'] for c in with_votes]==list(range(1,len(with_votes)+1)), 'Ra
 assert all(c['ranking'] is None for c in missing_votes), 'Ausência de votos não pode ter posição'
 assert all(a['votos']>=b['votos'] for a,b in zip(with_votes,with_votes[1:])), 'Ordenação de votos inválida'
 for c in cs:
+    assert type(c['municipiosComVotos']) is int and c['municipiosComVotos'] == len(c['votacaoMunicipal']), f"Contagem de municípios com votos inconsistente: {c['id']}"
     if c['votos'] is not None:assert sum(n for _,n in c['votacaoMunicipal'])==c['votos'],c['id']
     assert len(c['votacaoMunicipal'])==len({i for i,_ in c['votacaoMunicipal']})
     assert all(0<=i<len(cities) and n>0 for i,n in c['votacaoMunicipal'])
