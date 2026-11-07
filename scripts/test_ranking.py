@@ -38,6 +38,13 @@ class RankingTests(unittest.TestCase):
                          [('A', None), ('B', None)])
 
 
+    def test_importer_uses_the_verified_ranker_instead_of_custom_zero_vote_sorting(self):
+        root = Path(__file__).resolve().parents[1]
+        importer = (root / 'scripts/import_tse.py').read_text(encoding='utf8')
+        self.assertIn('from ranking import rank_candidates', importer)
+        self.assertIn('rank_candidates(result)', importer)
+        self.assertNotIn("result.sort(key=lambda x: (-(x['votos'] or 0),x['nome']))", importer)
+
     def test_existing_snapshot_reconciles_ranks_without_changing_vote_totals(self):
         root = Path(__file__).resolve().parents[1]
         snapshot = json.loads((root / 'data/candidatos.json').read_text(encoding='utf8'))

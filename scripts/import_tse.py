@@ -72,8 +72,10 @@ for key, r in cad.items():
     d = details.get(key,{})
     result[-1].update(votosValidos=valid_votes.get(key),registro=clean(d.get('DS_DETALHE_SITUACAO_CAND','')),julgamento=clean(d.get('DS_SITUACAO_JULGAMENTO','')),destinacao=clean(d.get('NM_TIPO_DESTINACAO_VOTOS','')))
     result[-1].update(votacaoMunicipal=[[city_indexes[name],n] for name,n in cities[key].items() if n>0],bensDeclarados=float(sum(assets[key].values())) if key in asset_counts else None,quantidadeBens=asset_counts.get(key),tiposBens=[dict(tipo=name,valor=float(value)) for name,value in sorted(assets[key].items())],redesDeclaradas=networks[key])
-result.sort(key=lambda x: (-(x['votos'] or 0),x['nome']))
-for i,r in enumerate(result,1): r['ranking']=i if r['votos'] is not None else None
+# Uma candidatura com 0 votos tem resultado conhecido e deve aparecer
+# antes daquelas sem votação registrada, sem abrir lacunas no ranking nominal.
+from ranking import rank_candidates
+rank_candidates(result)
 assert sum(r['eleito'] for r in result)==41
 assert len(result)==len({r['id'] for r in result})
 assert not (set(votes)-set(cad)), 'Votação sem cadastro correspondente'
